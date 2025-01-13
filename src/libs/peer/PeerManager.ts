@@ -9,13 +9,13 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 */
 
-import Peer, { SyncData } from "./Peer"
-import log from "src/utilities/logger"
-import Cryptography from "../crypto/cryptography"
-import { getSharedState } from "src/utilities/sharedState"
 import { RPCResponse } from "@kynesyslabs/demosdk/types"
-import { HelloPeerRequest } from "../network/manageHelloPeer"
 import fs from "fs"
+import log from "src/utilities/logger"
+import { getSharedState } from "src/utilities/sharedState"
+import Cryptography from "../crypto/cryptography"
+import { HelloPeerRequest } from "../network/manageHelloPeer"
+import Peer, { SyncData } from "./Peer"
 
 function ForgeToHex(forgeBuffer: any) {
     console.log("[forge to string encoded]")
@@ -92,7 +92,19 @@ export default class PeerManager {
     }
 
     getOfflinePeers(): Record<string, Peer> {
-        return this.offlinePeers
+        let possibleOfflinePeers: Record<string, Peer> = {}
+
+        for (const peer in this.peerList) {
+            if (this.peerList[peer].status.timestamp + 1000 < Date.now()) {
+                possibleOfflinePeers[peer] = this.peerList[peer]
+            }
+        }
+
+        for (const peer in this.offlinePeers) {
+            possibleOfflinePeers[peer] = this.offlinePeers[peer]
+        }
+
+        return possibleOfflinePeers
     }
 
     private _getActors(peers: boolean, connections: boolean): Peer[] {
@@ -270,6 +282,48 @@ export default class PeerManager {
         peer.sync.status = getSharedState.syncStatus
         peer.sync.block = getSharedState.lastBlockNumber
         peer.sync.block_hash = getSharedState.lastBlockHash
+    }
+
+    handleHelloPeerFromHeaders(
+        identity: string,
+        url: string,
+        syncData: SyncData,
+    ) {
+        const peer = new Peer()
+        peer.identity = identity
+        peer.connection.string = url
+
+        peer.verification.status = true
+        peer.verification.message = ""
+        peer.verification.timestamp = Date.now()
+
+        peer.status.online = true
+        peer.status.ready = true
+        peer.status.timestamp = peer.verification.timestamp
+
+        peer.sync = syncData
+
+        log.debug(
+            "[handleHelloPeerFromHeaders] Peer: " +
+                JSON.stringify(peer, null, 2),
+        )
+
+        this.addPeer(peer)
+    }
+
+    getOurSyncDataForHeaders(identity: string) {
+        const peer = this.peerList[identity]
+
+        if (!peer) {
+            log.error("[PEERMANAGER] Peer not found: " + identity)
+            return ""
+        }
+
+        let data = peer.sync
+
+        return `${data.block}>${data.block_hash}>${data.status ? 1 : 0}>${
+            getSharedState.exposedUrl
+        }`
     }
 
     addOfflinePeer(peerInstance: Peer) {

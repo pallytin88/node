@@ -11,28 +11,26 @@ import fastify, {
 import {
     BrowserRequest,
     BundleContent,
-    IWeb2Payload,
-    IWeb2Request,
     RPCRequest,
     RPCResponse,
 } from "@kynesyslabs/demosdk/types"
+import { processWeb2Payload } from "src/features/web2/routines/web2PayloadProcessor"
 import log from "src/utilities/logger"
+import required from "src/utilities/required"
 import sharedState, { getSharedState } from "src/utilities/sharedState"
 import Cryptography from "../crypto/cryptography"
 import { PeerManager } from "../peer"
 import ServerHandlers from "./endpointHandlers"
 import { AuthMessage, manageAuth } from "./manageAuth"
 import manageConsensusRoutines from "./manageConsensusRoutines"
-import manageGCRRoutines from "./manageGCRRoutines"
 import { manageExecution } from "./manageExecution"
+import manageGCRRoutines from "./manageGCRRoutines"
 import { HelloPeerRequest, manageHelloPeer } from "./manageHelloPeer"
 import { handleLoginRequest, handleLoginResponse } from "./manageLogin"
 import { manageNodeCall, NodeCall } from "./manageNodeCall"
 import { registerMethodListingEndpoint } from "./methodListing"
 import { rpcSchema, setupOpenAPI } from "./openApiSpec"
 import { handleWeb2ProxyRequest } from "./routines/transactions/handleWeb2ProxyRequest"
-import { processWeb2Payload } from "src/features/web2/routines/web2PayloadProcessor"
-import required from "src/utilities/required"
 
 // Reading the port from sharedState
 
@@ -94,6 +92,22 @@ function validateHeaders(headers: any): [boolean, string] {
     } else {
         log.info("[RPC Call] Headers are valid for: " + identity)
     }
+
+    if (headers["sync"]) {
+        const syncData = (headers["sync"] as string).split(">")
+
+        log.debug("[RPC Call] Sync data in headers: " + syncData)
+        PeerManager.getInstance().handleHelloPeerFromHeaders(
+            identity,
+            syncData[3],
+            {
+                block: parseInt(syncData[0]),
+                block_hash: syncData[1],
+                status: Boolean(parseInt(syncData[2])),
+            },
+        )
+    }
+
     return [true, ""]
 }
 

@@ -1,9 +1,10 @@
-import log from "src/utilities/logger"
 import { IPeer, RPCRequest, RPCResponse } from "@kynesyslabs/demosdk/types"
 import axios from "axios"
+import log from "src/utilities/logger"
 import { getSharedState } from "src/utilities/sharedState"
 import Cryptography from "../crypto/cryptography"
 import { NodeCall } from "../network/manageNodeCall"
+import PeerManager from "./PeerManager"
 
 export interface SyncData {
     status: boolean
@@ -255,6 +256,9 @@ export default class Peer {
                         "Content-Type": "application/json",
                         identity: pubkey,
                         signature: signature,
+                        sync: PeerManager.getInstance().getOurSyncDataForHeaders(
+                            pubkey,
+                        ),
                     },
                     timeout: 3000,
                 },

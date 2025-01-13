@@ -34,7 +34,7 @@ async function mainLoopCycle() {
         true,
     )
     // ANCHOR Get the current UTC time (set the currentUTCTime variable in sharedState)
-    await getSharedState.getUTCTime()
+    // await getSharedState.getUTCTime()
     log.info(
         `[MAIN LOOP] Current UTC time: ${getSharedState.currentUTCTime}`,
     )
@@ -60,7 +60,7 @@ async function mainLoopCycle() {
     // ANCHOR Syncing the blockchain after the peer routine
     log.info("[MAIN LOOP] Synced! 🟢", true)
 
-    await PeerManager.getInstance().sayHelloToAllPeers()
+    // await PeerManager.getInstance().sayHelloToAllPeers()
     // SECTION Todo list for a typical consensus operation
 
     // ANCHOR Check if we have to forge the block now
