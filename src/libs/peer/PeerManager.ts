@@ -190,6 +190,7 @@ export default class PeerManager {
             }
             await PeerManager.sayHelloToPeer(peerInstance)
         }
+
         // Returning the list of online peers from the peerlist
         return this.getPeers() // REVIEW is this working?
     }
@@ -362,7 +363,12 @@ export default class PeerManager {
         getSharedState.peerRoutineRunning += 1 // Adding one to the peer routine running counter
 
         // TODO test and finalize this method
-        log.debug("[Hello Peer] Saying hello to peer " + peer.identity)
+        log.debug(
+            "[Hello Peer] Saying hello to peer: " +
+                peer.connection.string +
+                " : " +
+                peer.identity,
+        )
         const our_id = getSharedState.identity.ed25519.publicKey
         let connection_string = getSharedState.exposedUrl // ? Are we sure about this
         let signed_connection_string = Cryptography.sign(
@@ -411,27 +417,24 @@ export default class PeerManager {
 
     // Callback for the hello peer
     static helloPeerCallback(response: RPCResponse, peer: Peer) {
-        log.info(
-            "[Hello Peer] Response received from peer: " + peer.identity,
-            false,
+        log.debug(
+            "[Hello Peer] Response received from peer: " +
+                peer.connection.string +
+                ":" +
+                peer.identity,
         )
         //console.log(response) // ? Delete this if not needed
         // TODO Test and Finish this
         // REVIEW is the message the response itself?
-        log.info("[Hello Peer] Response message: " + response.response, false)
+        log.debug("[Hello Peer] Response message: " + response.response)
         // Based on the response, we can decide what to do
         if (response.result === 200) {
             log.info(
                 "[Hello Peer] Peer is online, replied and recognized us. Adding to peer list",
-                false,
             )
-            log.info(
-                "[Hello Peer] Received message: " + response.extra.msg,
-                false,
-            )
+            log.info("[Hello Peer] Received message: " + response.extra.msg)
             log.info(
                 "[Hello Peer] Received sync data: " + response.extra.syncData,
-                false,
             )
 
             if (response.extra.syncData) {
