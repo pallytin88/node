@@ -260,7 +260,7 @@ export default class Peer {
                             pubkey,
                         ),
                     },
-                    timeout: 1500,
+                    timeout: 2000,
                 },
             )
             log.info(
