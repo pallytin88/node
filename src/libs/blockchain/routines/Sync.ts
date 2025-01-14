@@ -33,6 +33,14 @@ async function sleep(time: number) {
     return new Promise(resolve => setTimeout(resolve, time))
 }
 
+const latestBlock = () =>
+    peerManager
+        .getAll()
+        .reduce((max, peer) => Math.max(max, peer.sync.block), 0)
+
+const highestBlockPeer = () =>
+    peerManager.getAll().find(peer => peer.sync.block === latestBlock())
+
 /**
  * Get the highest block number and peer from the network. If we're synced
  * we return null for the peer.
@@ -298,23 +306,15 @@ async function downloadBlock(peer: Peer, blockToAsk: number) {
  */
 async function waitForNextBlock() {
     log.debug("[waitForNextBlock] Waiting for next block")
-    const latestBlock = () =>
-        peerManager
-            .getAll()
-            .reduce((max, peer) => Math.max(max, peer.sync.block), 0)
 
     while (getSharedState.lastBlockNumber >= latestBlock()) {
         await sleep(250)
     }
 
-    const highestBlockPeer = peerManager
-        .getAll()
-        .find(peer => peer.sync.block === latestBlock())
-
     log.debug("[waitForNextBlock] NEXT BLOCK GENERATED. DOWNLOADING...")
 
     return await downloadBlock(
-        highestBlockPeer,
+        highestBlockPeer(),
         getSharedState.lastBlockNumber + 1,
     )
 }
@@ -325,30 +325,27 @@ async function waitForNextBlock() {
  * @param peer - The peer to request the blocks from
  * @returns True if the blocks were requested successfully, false otherwise
  */
-async function requestBlocks(peer: Peer) {
+async function requestBlocks() {
     // REVIEW: lowest or highest?
     // Sync the blocks one by one starting from the lowest block number that we do not have
     // ? Way more error handling needed
-    console.error(
-        "[fastSync] Syncing blocks from peer: " + JSON.stringify(peer),
-    )
+    // console.error(
+    //     "[fastSync] Syncing blocks from peer: " + JSON.stringify(peer),
+    // )
 
-    if (!peerManager.getPeer(peer.identity)) {
-        log.error("[fastSync] Peer not found")
-        return false
-    }
+    // if (!peerManager.getPeer(peer.identity)) {
+    //     log.error("[fastSync] Peer not found")
+    //     return false
+    // }
 
-    while (
-        getSharedState.lastBlockNumber <=
-        peerManager.getPeer(peer.identity).sync.block
-    ) {
+    while (getSharedState.lastBlockNumber <= latestBlock()) {
         const blockToAsk = getSharedState.lastBlockNumber + 1
         // log.debug("[fastSync] Sleeping for 1 second")
         // await sleep(250)
 
         log.debug("[fastSync] Asking peer for block: " + blockToAsk)
         try {
-            await downloadBlock(peer, blockToAsk)
+            await downloadBlock(highestBlockPeer(), blockToAsk)
         } catch (error) {
             // INFO: Handle chain head reached
             if (error instanceof BlockNotFoundError) {
@@ -450,7 +447,7 @@ async function fastSyncRoutine(peers: Peer[] = []) {
         return false
     }
 
-    const synced = await requestBlocks(highestBlockNumberPeer)
+    const synced = await requestBlocks()
 
     if (synced && getSharedState.fastSyncCount === 0) {
         await waitForNextBlock()
