@@ -171,8 +171,10 @@ export default class PeerManager {
     }
 
     async getOnlinePeers(): Promise<Peer[]> {
+        const promises: Promise<void>[] = []
+
         //const onlinePeers: Peer[] = []
-        for await (const _peer of Object.values(this.peerList)) {
+        for (const _peer of Object.values(this.peerList)) {
             const peerInstance = new Peer()
             peerInstance.identity = _peer.identity
             peerInstance.connection.string = _peer.connection.string
@@ -188,9 +190,10 @@ export default class PeerManager {
                 log.info("[PEERMANAGER] Peer is us: skipping", false)
                 continue
             }
-            await PeerManager.sayHelloToPeer(peerInstance)
+            promises.push(PeerManager.sayHelloToPeer(peerInstance))
         }
 
+        await Promise.all(promises)
         // Returning the list of online peers from the peerlist
         return this.getPeers() // REVIEW is this working?
     }
@@ -401,7 +404,7 @@ export default class PeerManager {
                 JSON.stringify(hello_request, null, 2),
         )
         // Not awaiting the response to not block the main thread
-        peer.longCall(
+        const response = await peer.longCall(
             {
                 method: "hello_peer",
                 params: [hello_request],
@@ -409,10 +412,14 @@ export default class PeerManager {
             true,
             250,
             3,
-        ).then(response => {
-            PeerManager.helloPeerCallback(response, peer)
-        })
+        )
+
         log.debug("[Hello Peer] Hello request sent: waiting for response")
+        return PeerManager.helloPeerCallback(response, peer)
+
+        // .then(response => {
+        //     PeerManager.helloPeerCallback(response, peer)
+        // })
     }
 
     // Callback for the hello peer
