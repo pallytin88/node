@@ -711,7 +711,7 @@ export default class SecretaryManager {
 
             log.debug("Sending setValidatorPhase request to the secretary")
             log.debug("Secretary is: " + this.secretary.identity)
-            return await this.secretary.longCall(request, true, 1000, retries)
+            return await this.secretary.longCall(request, true, 250, retries)
         }
 
         const handleSendStatusRes = async (res: RPCResponse) => {

@@ -411,7 +411,7 @@ async function updateValidatorPhase(phase: number): Promise<any> {
 
     // INFO: If it's the first phase, the secretary might not have started the consensus routine yet,
     // Increase retry steps to 10 to wait for the secretary to start
-    const retries = phase === 1 ? 10 : 3
+    const retries = phase === 1 ? 10 : 4
     const res = await manager.sendOurValidatorPhaseToSecretary(retries)
 
     log.debug(
