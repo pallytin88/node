@@ -91,7 +91,3 @@ export default class Demos {
         return rpc_response
     }
 }
-
-async function sleep(time: number) {
-    return new Promise(resolve => setTimeout(resolve, time))
-}

@@ -27,6 +27,7 @@ export interface ConsensusMethod {
         // REVIEW: Remove deprecated methods
         | "setValidatorPhase"
         | "getValidatorPhase"
+        | "getAllValidatorPhases"
         | "greenlight"
         | "getBlockTimestamp"
     params: any[]
@@ -47,7 +48,7 @@ export default async function manageConsensusRoutines(
     // If the consensus is already running, we do not need to check the time again
     // ! When we return false, we cannot have the client asking for the same method over and over again or
     // ! continue asking for consensus_routine, we must rate limit the requests
-    const isConsensusTime = await checkConsensusTime(true, 2)
+    const [isConsensusTime, delta] = await checkConsensusTime(true, 2)
     const isConsensusRunning = isConsensusAlreadyRunning()
     const inConsensus = isConsensusTime || isConsensusRunning
 
@@ -301,6 +302,23 @@ export default async function manageConsensusRoutines(
             const manager = SecretaryManager.getInstance()
             response.result = 200
             response.response = [manager.ourValidatorPhase.currentPhase]
+            break
+        }
+
+        case "getAllValidatorPhases": {
+            const manager = SecretaryManager.getInstance()
+
+            const data: { [key: string]: number } = {}
+
+            for (const identity of Object.keys(
+                manager.shard.validationPhases,
+            )) {
+                data[identity] =
+                    manager.shard.validationPhases[identity].currentPhase
+            }
+
+            response.result = 200
+            response.response = data
             break
         }
 

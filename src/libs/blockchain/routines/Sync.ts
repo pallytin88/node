@@ -301,10 +301,9 @@ async function downloadBlock(peer: Peer, blockToAsk: number) {
 /**
  * Wait for the next block to be generated and download it
  *
- * @param peer - The peer to wait for the next block
  * @returns True if the block was downloaded successfully, false otherwise
  */
-async function waitForNextBlock() {
+export async function waitForNextBlock() {
     log.debug("[waitForNextBlock] Waiting for next block")
 
     while (getSharedState.lastBlockNumber >= latestBlock()) {
