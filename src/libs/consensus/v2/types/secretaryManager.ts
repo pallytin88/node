@@ -870,7 +870,8 @@ export default class SecretaryManager {
         const res = await this.secretary.call(request)
 
         if (res.result == 200) {
-            return res.response[0] as number
+            this.blockTimestamp = res.response[0] as number
+            return this.blockTimestamp
         }
 
         log.error(

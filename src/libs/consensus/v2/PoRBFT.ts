@@ -116,19 +116,15 @@ export async function consensusRoutine(): Promise<void> {
 
         // INFO: At this point, we should have the secretary block timestamp
         // if we're connected to the secretary and recieved atleast one successful request from them
-        if (manager.blockTimestamp) {
-            getSharedState.lastConsensusTime = manager.blockTimestamp
-        } else {
+        if (!manager.blockTimestamp) {
             // INFO: This should never happen
             // If it does, request the block timestamp from the secretary
             log.debug(
                 "[CONSENSUS ROUTINE] Secretary block timestamp not received yet, requesting it ...",
             )
-            const blockTimestamp = await manager.getSecretaryBlockTimestamp()
+            await manager.getSecretaryBlockTimestamp()
 
-            if (blockTimestamp) {
-                getSharedState.lastConsensusTime = blockTimestamp
-            } else {
+            if (!manager.blockTimestamp) {
                 log.error(
                     "[CONSENSUS ROUTINE] Block timestamp is not set, stopping the node ...",
                 )

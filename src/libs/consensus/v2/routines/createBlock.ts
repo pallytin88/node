@@ -51,7 +51,11 @@ export async function createBlock(
 
     /* NOTE - The block timestamp is the average timestamp of the shard 
     see averageTimestamp.ts for more details */
-    block.content.timestamp = SecretaryManager.getInstance().blockTimestamp
+    const manager = SecretaryManager.getInstance()
+    log.debug(
+        `[CONSENSUS ROUTINE] Forging block with timestamp: ${manager.blockTimestamp}`,
+    )
+    block.content.timestamp = manager.blockTimestamp
     // Add the candidate to the shared state
     getSharedState.candidateBlock = block
     return block
