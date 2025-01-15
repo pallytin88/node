@@ -176,7 +176,7 @@ export default class SecretaryManager {
                     log.debug(
                         "[SECRETARY ROUTINE] Waiting for the set wait status",
                     )
-                    await Waiter.wait(Waiter.keys.SET_WAIT_STATUS, 6000)
+                    await Waiter.wait(Waiter.keys.SET_WAIT_STATUS, 30000)
                     log.debug(
                         "[SECRETARY ROUTINE] SET_WAIT_STATUS Lock resolved",
                     )
@@ -565,7 +565,7 @@ export default class SecretaryManager {
             log.debug(
                 `[SECRETARY ROUTINE] Sending greenlight to ${member.identity} with timestamp ${this.blockTimestamp} and phase ${phase}`,
             )
-            promises.push(member.longCall(request, true, 250, 4))
+            promises.push(member.longCall(request, true, 250, 8))
         }
 
         const results = await Promise.all(promises)
@@ -690,7 +690,7 @@ export default class SecretaryManager {
 
         const waiterKey =
             Waiter.keys.GREEN_LIGHT + this.ourValidatorPhase.currentPhase
-        const greenlight: Promise<null> = Waiter.wait(waiterKey, 8000)
+        const greenlight: Promise<null> = Waiter.wait(waiterKey, 40000)
 
         const sendStatus = async () => {
             const request: RPCRequest = {

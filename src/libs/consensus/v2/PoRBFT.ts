@@ -280,7 +280,7 @@ async function mergeAndOrderMempools(shard: Peer[]): Promise<Transaction[]> {
     log.info("[consensusRoutine] Mempools have been merged")
     // await updateValidatorStatus("mergedMempool", true, false, true)
     // Using the secretary to update the local statuses
-    await updateValidatorPhase(3)
+    // await updateValidatorPhase(3)
     return await orderTransactions(mergedMempool)
 }
 
@@ -309,7 +309,7 @@ async function applyGCRForNewBlock(
     log.info(`[consensusRoutine] Failed GCR operations: ${failedTxs}`)
     // await updateValidatorStatus("appliedGCR", true, false, true)
     // Using the secretary to update the local statuses
-    await updateValidatorPhase(4)
+    // await updateValidatorPhase(4)
     return [successfulTxs, failedTxs]
 }
 
@@ -436,7 +436,7 @@ async function updateValidatorPhase(phase: number): Promise<any> {
 
     // INFO: If it's the first phase, the secretary might not have started the consensus routine yet,
     // Increase retry steps to 10 to wait for the secretary to start
-    const retries = phase === 1 ? 10 : 4
+    const retries = phase === 1 ? 10 : 10
     const res = await manager.sendOurValidatorPhaseToSecretary(retries)
 
     log.debug(
