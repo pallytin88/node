@@ -10,7 +10,6 @@ import { RPCRequest, RPCResponse } from "@kynesyslabs/demosdk/types"
 import log from "src/utilities/logger"
 import { TimeoutError, AbortError, NotInShardError } from "src/exceptions"
 import Cryptography from "src/libs/crypto/cryptography"
-import sleep from "src/utilities/sleep"
 
 // ANCHOR SecretaryManager
 export default class SecretaryManager {
@@ -33,14 +32,6 @@ export default class SecretaryManager {
             getSharedState.identity.ed25519.publicKey.toString("hex"),
             getSharedState.identity.ed25519.privateKey,
         ).toString("hex")
-    }
-
-    get weAreSecond() {
-        if (this.shard.members.length < 2) {
-            return false
-        }
-
-        return this.shard.members[1].identity === this.ourKey
     }
 
     constructor() {}
@@ -80,12 +71,12 @@ export default class SecretaryManager {
         log.debug("SECRETARY: " + this.secretary.identity)
 
         // INFO: If some nodes crash, kill the node for debugging!
-        // if (this.shard.members.length < 4 && this.shard.blockRef > 10) {
-        //     log.debug(
-        //         `Only ${this.shard.members.length} members in the shard. Exiting ...`,
-        //     )
-        //     process.exit(0)
-        // }
+        if (this.shard.members.length < 4 && this.shard.blockRef > 10) {
+            log.debug(
+                `Only ${this.shard.members.length} members in the shard. Exiting ...`,
+            )
+            process.exit(0)
+        }
 
         // INFO: Start the secretary routine
         if (this.checkIfWeAreSecretary()) {
@@ -696,16 +687,6 @@ export default class SecretaryManager {
         //     // await this.simulateNormalNodeGoingOffline()
         //     // await this.simulateSecretaryGoingOffline()
         // }
- 
-        // if (this.shard.blockRef % 3 == 0 && this.weAreSecond) {
-        //     log.debug(
-        //         "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐",
-        //     )
-        //     log.debug(
-        //         "We are the second node and we are forging block %3, sleeping for X seconds",
-        //     )
-        //     await sleep(7000)
-        // }
 
         const waiterKey =
             Waiter.keys.GREEN_LIGHT + this.ourValidatorPhase.currentPhase
@@ -897,38 +878,5 @@ export default class SecretaryManager {
                 res.result,
         )
         return null
-    }
-
-    public async weCanJoinConsensus() {
-        const request: RPCRequest = {
-            method: "consensus_routine",
-            params: [
-                {
-                    method: "getAllValidatorPhases",
-                },
-            ],
-        }
-
-        const res = await this.secretary.longCall(request, true, 250, 2)
-
-        if (res.result == 200) {
-            const data = res.response as { [key: string]: number }
-
-            if (typeof data[this.ourKey] === "number") {
-                return true
-            }
-
-            // INFO: Get highest phase
-            const highestPhase = Math.max(...Object.values(data))
-
-            // INFO: If we're past merging mempools, we can't join the consensus
-            if (highestPhase > 3) {
-                return false
-            }
-
-            return true
-        }
-
-        return false
     }
 }

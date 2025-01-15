@@ -38,10 +38,3 @@ export class NotInShardError extends Error {
         this.name = "NotInShardError"
     }
 }
-
-export class LeftBehindError extends Error {
-    constructor(message: string) {
-        super(message)
-        this.name = "LeftBehindError"
-    }
-}
