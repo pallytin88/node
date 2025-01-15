@@ -565,7 +565,7 @@ export default class SecretaryManager {
             log.debug(
                 `[SECRETARY ROUTINE] Sending greenlight to ${member.identity} with timestamp ${this.blockTimestamp} and phase ${phase}`,
             )
-            promises.push(member.longCall(request, true, 250, 8))
+            promises.push(member.longCall(request, true, 250, 8, [400]))
         }
 
         const results = await Promise.all(promises)
@@ -626,6 +626,13 @@ export default class SecretaryManager {
         log.debug("Secretary timestamp: " + secretaryBlockTimestamp)
         log.debug("Secretary: " + this.secretary.identity)
         log.debug("---- END DIAGNOSTICS ----")
+
+        if (secretaryBlockTimestamp < this.blockTimestamp) {
+            log.debug(
+                "Greenlight received for an older block,returning false ...",
+            )
+            return false
+        }
 
         // INFO: Only assign the block timestamp if it's greater than the current block timestamp
         // NOTE: Stray greenlights from previous rounds need to be ignored
