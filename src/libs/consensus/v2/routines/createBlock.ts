@@ -7,6 +7,7 @@ import log from "src/utilities/logger"
 import { Transaction } from "@kynesyslabs/demosdk/types"
 import Peer from "src/libs/peer/Peer"
 import hashGCRTables from "src/libs/blockchain/gcr/gcr_routines/hashGCR"
+import SecretaryManager from "../types/secretaryManager"
 
 export async function createBlock(
     orderedTransactions: Transaction[],
@@ -50,7 +51,7 @@ export async function createBlock(
 
     /* NOTE - The block timestamp is the average timestamp of the shard 
     see averageTimestamp.ts for more details */
-    block.content.timestamp = getSharedState.lastConsensusTime
+    block.content.timestamp = SecretaryManager.getInstance().blockTimestamp
     // Add the candidate to the shared state
     getSharedState.candidateBlock = block
     return block
