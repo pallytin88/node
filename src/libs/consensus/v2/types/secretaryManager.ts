@@ -24,7 +24,7 @@ export default class SecretaryManager {
     public ourValidatorPhase: ValidationPhase
     public ourKey: string
     public runSecretaryRoutine: boolean = false
-    public blockTimestamp: number
+    public blockTimestamp: number = null
 
     // INFO: Our signature is send with the greenlight request
     get ourSignature() {
@@ -627,9 +627,11 @@ export default class SecretaryManager {
         log.debug("Secretary: " + this.secretary.identity)
         log.debug("---- END DIAGNOSTICS ----")
 
+        // INFO: Only assign the block timestamp if it's greater than the current block timestamp
+        // NOTE: Stray greenlights from previous rounds need to be ignored
         if (
             secretaryBlockTimestamp &&
-            this.ourValidatorPhase.currentPhase < 5
+            secretaryBlockTimestamp > this.blockTimestamp
         ) {
             this.blockTimestamp = secretaryBlockTimestamp
         }
