@@ -79,6 +79,7 @@ export default class log {
         logToTerminal: boolean = true,
         cleanFile: boolean = false,
     ) {
+        return
         const logEntry = `[INFO] [${this.getTimestamp()}] ${message}\n`
         if (this.logToTerminal[logfile] && logToTerminal) {
             term.bold(logEntry.trim())
@@ -94,6 +95,7 @@ export default class log {
     }
 
     static info(message: string, logToTerminal: boolean = true) {
+        return
         const logEntry = `[INFO] [${this.getTimestamp()}] ${message}\n`
         if (logToTerminal) {
             term.bold(logEntry.trim() + "\n")
@@ -111,6 +113,7 @@ export default class log {
     }
 
     static debug(message: string, logToTerminal: boolean = true) {
+        return
         const logEntry = `[DEBUG] [${this.getTimestamp()}] ${message}\n`
         if (logToTerminal) {
             term.magenta(logEntry.trim() + "\n")
@@ -120,6 +123,7 @@ export default class log {
     }
 
     static warning(message: string, logToTerminal: boolean = true) {
+        return
         const logEntry = `[WARNING] [${this.getTimestamp()}] ${message}\n`
         if (logToTerminal) {
             term.yellow(logEntry.trim() + "\n")
