@@ -35,6 +35,8 @@ const term = terminalkit.terminal
 
 dotenv.config()
 
+console.log = () => {}
+
 // NOTE This is a global variable that will be used to store the warmup routine and the index needed variables
 let indexState: {
     OVERRIDE_PORT: number | null
