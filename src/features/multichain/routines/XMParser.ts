@@ -1,11 +1,11 @@
 // INFO In this module is offloaded the parsing of XM requests
-import * as fs from "fs"
-import * as multichain from "@kynesyslabs/demosdk/xm-localsdk"
 import { IOperation, XMScript } from "@kynesyslabs/demosdk/types"
+import * as multichain from "@kynesyslabs/demosdk/xm-localsdk"
+import * as fs from "fs"
 import { chainIds } from "sdk/localsdk/multichain/configs/chainIds"
 
-import handlePayOperation from "./executors/pay"
 import handleContractRead from "./executors/contract_read"
+import handlePayOperation from "./executors/pay"
 
 // NOTE We define multichain into global so that we can use it later
 global.multichain = multichain
@@ -24,8 +24,7 @@ class XMParser {
     // INFO Same as below but with file support
     static async loadFile(path: string): Promise<XMScript> {
         if (!fs.existsSync(path)) {
-            console.log("The file does not exist.")
-            return null
+                        return null
         }
         let script = fs.readFileSync(path, "utf8")
         return await XMParser.load(script)
@@ -64,17 +63,10 @@ class XMParser {
                 name = Object.keys(fullscript.operations)[
                     id
                 ]
-                console.log("[" + name + "] ")
-                operation = fullscript.operations[name]
-                console.log("[XMParser]: full script operation")
-                console.log(fullscript)
-                console.log("[XMParser]: partial operation")
-                console.log(operation)
-                results[name] = await XMParser.executeOperation(operation)
-                console.log("[RESULT]: " + results[name])
-            } catch (e) {
-                console.log("[XM EXECUTE] Error: " + e)
-                results[name] = { result: "error", error: e }
+                                operation = fullscript.operations[name]
+                                                                                results[name] = await XMParser.executeOperation(operation)
+                            } catch (e) {
+                                results[name] = { result: "error", error: e }
             }
         }
         return results // REVIEW Is the type ok?

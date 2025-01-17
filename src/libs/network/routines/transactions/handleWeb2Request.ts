@@ -1,8 +1,6 @@
-import { IWeb2Request } from "@kynesyslabs/demosdk/types"
-import { RPCResponse } from "@kynesyslabs/demosdk/types"
-import { emptyResponse } from "../../server_rpc"
+import { IWeb2Request, RPCResponse } from "@kynesyslabs/demosdk/types"
 import _ from "lodash"
-import { handleWeb2 } from "src/features/web2/handleWeb2"
+import { emptyResponse } from "../../server_rpc"
 
 // ? Can we avoid calling another function pls?
 
@@ -17,8 +15,7 @@ export default async function handleWeb2Request(
      * An operation for the gas is also pushed in the GCR.
      * The tx is pushed in the mempool if applicable.
      */
-    console.log("[SERVER] Received web2Request")
-    //console.log(JSON.stringify(request))
+        //)
     let response = _.cloneDeep(emptyResponse)
 
     let extra: string,
@@ -28,12 +25,8 @@ export default async function handleWeb2Request(
     // const currentPeerString = Identity.getInstance().getConnectionString()
     // NOTE Switched to the new class
 
-    //console.log("[WEB2 CONTENT DUMP]")
-    //console.log(content)
-    let fullResponse = await handleWeb2(content)
-    //console.log("[WEB2 CONTENT RESPONSE DUMP]")
-    //console.log(fullResponse)
-
+    //    //    let fullResponse = await handleWeb2(content)
+    //    //
     // Managing the results
     if (fullResponse[0]) {
         webResponse = fullResponse[1] as IWeb2Request

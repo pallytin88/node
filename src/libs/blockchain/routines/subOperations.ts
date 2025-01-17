@@ -32,8 +32,7 @@ export default class subOperations {
         }
         // NOTE Insert blindly stuff into the GCR if no genesis is present
         // Using the genesis schema it is easy to follow the structure of the genesis file
-        console.log(operation.params)
-        let genesis_content: Genesis = operation.params
+                let genesis_content: Genesis = operation.params
         // Let's extract the genesis transaction from the genesis block
         let genesis_tx = await Chain.getTransactionFromHash(
             genesis_block.content.ordered_transactions[0],

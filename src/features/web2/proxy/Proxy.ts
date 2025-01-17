@@ -1,14 +1,14 @@
-import https from "https"
-import http from "http"
-import httpProxy from "http-proxy"
-import { URL } from "url"
-import net from "net"
 import {
-    IWeb2Request,
     EnumWeb2Methods,
+    IWeb2Request,
     IWeb2Result,
 } from "@kynesyslabs/demosdk/types"
+import http from "http"
+import httpProxy from "http-proxy"
+import https from "https"
+import net from "net"
 import required from "src/utilities/required"
+import { URL } from "url"
 
 /**
  * A proxy server class that handles HTTP/HTTPS requests by creating a local proxy server.
@@ -167,8 +167,7 @@ export class Proxy {
     stopProxy(): void {
         if (this._server) {
             this._server.close(() => {
-                console.log("[Web2API] Proxy server stopped")
-                this._isInitialized = false
+                                this._isInitialized = false
                 this._server = null
             })
 
@@ -237,8 +236,7 @@ export class Proxy {
             proxyServer.on("error", (err, req, res) => {
                 console.error("[Web2API] Proxy server error:", err)
                 if (res instanceof http.ServerResponse) {
-                    console.log("[Web2API] Writing response")
-                    res.writeHead(500, {
+                                        res.writeHead(500, {
                         "Content-Type": "text/plain",
                     })
                     res.end("Something went wrong with the proxy.")
@@ -311,10 +309,7 @@ export class Proxy {
                 const address = this._server?.address()
                 if (typeof address === "object" && address !== null) {
                     this._proxyPort = address.port
-                    console.log(
-                        `[Web2API] Proxy server running at http://127.0.0.1:${this._proxyPort}/`,
-                    )
-                    resolve()
+                                        resolve()
                 } else {
                     reject(new Error("[Web2API] Failed to get server address"))
                 }
@@ -337,20 +332,15 @@ export class Proxy {
         const sessionIdHeader = req.headers["x-dahr-session-id"]
 
         if (!sessionIdHeader) {
-            console.log("[Web2API] Request rejected: Missing session ID header")
-            return false
+                        return false
         }
 
         if (Array.isArray(sessionIdHeader)) {
-            console.log(
-                "[Web2API] Request rejected: Multiple session ID headers",
-            )
-            return false
+                        return false
         }
 
         if (sessionIdHeader !== this._dahrSessionId) {
-            console.log("[Web2API] Request rejected: Session ID mismatch")
-            return false
+                        return false
         }
 
         return true

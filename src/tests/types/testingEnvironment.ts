@@ -1,7 +1,6 @@
 // INFO Import everything
 
 // Connectivitiy
-import socket from "socket.io"
 import io from "socket.io-client"
 import Block from "src/libs/blockchain/block"
 import Chain from "src/libs/blockchain/chain"
@@ -61,11 +60,8 @@ export default class testingEnvironment {
             "[DEMOS Infrastructure Testing Environment] Retrieving instance...\n",
         )
         term.yellow("[START OF AVAILABLE MODULES]\n")
-        console.log(testingEnvironment.instance.modules)
-        console.log("[END OF AVAILABLE MODULES]")
-        term.yellow("[CONNECTING TO RPC SERVER]\n")
-        console.log(process.env.RPC_URL)
-        testingEnvironment.instance.connect()
+                        term.yellow("[CONNECTING TO RPC SERVER]\n")
+                testingEnvironment.instance.connect()
         // Waiting for the blockchain to be connected
         await testingEnvironment.instance.isConnected()
         return testingEnvironment.instance
@@ -89,8 +85,7 @@ export default class testingEnvironment {
             term.bold.red(
                 "[DEMOS Infrastructure Testing Environment] Connection error\n",
             )
-            console.log(this.connection)
-            term.bold.red(
+                        term.bold.red(
                 "[DEMOS Infrastructure Testing Environment] Connection error\n",
             )
         })

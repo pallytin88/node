@@ -100,8 +100,7 @@ export default async function handleDemosWorkRequest(
     const response: RPCResponse = _.cloneDeep(emptyResponse)
 
     log.info("[demosWork] [handleDemosWorkRequest] Received a DemoScript: ")
-    console.log(content)
-
+    
     /* TODO As this fails if any step fails, we need to ensure that if not
     explicitly specified otherwise, the steps are executed even if one fails with a
     fallback to the next step and a meaningful error(s) log in the return value */

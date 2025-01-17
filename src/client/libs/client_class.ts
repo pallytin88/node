@@ -1,5 +1,4 @@
 import forge from "node-forge"
-import * as socket from "socket.io"
 import * as socket_client from "socket.io-client"
 
 import Network from "./network"
@@ -27,8 +26,7 @@ export default class Client {
         this.rpc_url = url
         let success = await Network.rpcConnect(this.rpc_url, this.socket)
         if (success) {
-            console.log("Connected to server")
-            this.STATUS_PROMPT = "Connected"
+                        this.STATUS_PROMPT = "Connected"
             this.STATUS_FLAG = "OK"
             this.socket = success
         } else {

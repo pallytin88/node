@@ -1,34 +1,22 @@
 import { EnhancedCrypto } from "./enigma_lite"
 async function run_tests() {
-    console.log("Generating keys...")
-    const { publicKey, privateKey } = EnhancedCrypto.generateKeys()
-    console.log("Keys generated.")
-
+        const { publicKey, privateKey } = EnhancedCrypto.generateKeys()
+    
     const message = "Hello, world! This is a secret message."
-    console.log(`Original message: ${message}`)
-
+    
     // Signing
-    console.log("Signing message...")
-    const signature = EnhancedCrypto.sign(message, privateKey)
-    console.log(`Signature: ${signature}`)
-
+        const signature = EnhancedCrypto.sign(message, privateKey)
+    
     // Verifying
-    console.log("Verifying signature...")
-    const isValid = EnhancedCrypto.verify(message, signature, publicKey)
-    console.log(`Signature valid: ${isValid}`)
-
+        const isValid = EnhancedCrypto.verify(message, signature, publicKey)
+    
     // Encrypting
-    console.log("Encrypting message...")
-    const encrypted = EnhancedCrypto.encrypt(message, publicKey)
-    console.log(`Encrypted message: ${encrypted}`)
-
+        const encrypted = EnhancedCrypto.encrypt(message, publicKey)
+    
     // Decrypting
-    console.log("Decrypting message...")
-    const decrypted = EnhancedCrypto.decrypt(encrypted, privateKey)
-    console.log(`Decrypted message: ${decrypted}`)
-
+        const decrypted = EnhancedCrypto.decrypt(encrypted, privateKey)
+    
     // Verify decryption was successful
-    console.log(`Decryption successful: ${message === decrypted}`)
-}
+    }
 
 run_tests()

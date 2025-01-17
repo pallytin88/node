@@ -2,10 +2,9 @@ import { Peer, PeerManager } from "src/libs/peer"
 import { getSharedState } from "src/utilities/sharedState"
 import { promisify } from "util"
 
-import Transmission from "../../communications/transmission"
 /* eslint-disable indent */
-import * as stat from "./timeSyncUtils"
 import { NodeCall } from "../manageNodeCall"
+import * as stat from "./timeSyncUtils"
 
 const sleep = promisify(setTimeout)
 interface Offset {
@@ -28,9 +27,7 @@ export default async function getPeerTime(
     }
 
     console.warn("[PEER TIMESYNC] Getting peer time delta")
-    console.log(peer)
-    console.log(id)
-
+        
     let node_call: NodeCall = {
         message: "getPeerTime",
         data: null,
@@ -44,12 +41,8 @@ export default async function getPeerTime(
 
     // Response management
     if (response.result === 200) {
-        console.log(
-            `[PEER TIMESYNC] Received timestamp in response: ${response.response}`,
-        )
-    } else {
-        console.log("[PEER TIMESYNC] No timestamp received")
-    }
+            } else {
+            }
     return response.response.timestamp
 }
 
@@ -73,16 +66,11 @@ export const calculatePeerTimeOffset =
         const roundtrips = results.map(result => result.roundtrip)
         const limit = stat.median(roundtrips) + stat.std(roundtrips)
 
-        console.log(
-            `[PEER TIMESYNC] latency median: ${stat.median(roundtrips)}`,
+        }`,
         )
-        console.log(
-            `[PEER TIMESYNC] latency standard deviation: ${stat.std(
-                roundtrips,
-            )}`,
+        }`,
         )
-        console.log(`[PEER TIMESYNC] latency limit: ${limit}`)
-        // filter all results which have a roundtrip smaller than the mean+std
+                // filter all results which have a roundtrip smaller than the mean+std
         const filtered = results.filter(result => result.roundtrip < limit)
         const processedOffsets = filtered.map(result => result.offset)
         const processedLatencies = filtered.map(result => result.roundtrip / 2)

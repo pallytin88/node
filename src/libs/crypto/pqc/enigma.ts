@@ -1,5 +1,5 @@
 // NOTE This is the Enigma PQC library. It will supersede the existing PQC library located in 'features'
-import { superDilithium } from "superdilithium"
+import { superDilithium } from "superdilithium";
 
 export default class Enigma {
 
@@ -44,7 +44,6 @@ async function main() {
     const enigma = new Enigma()
     await enigma.init()
     const keys = await enigma.exportKeys("password")
-    console.log(keys)
-}
+    }
 
 main()

@@ -1,8 +1,6 @@
 // INFO This is the main client for any user that want to interact with DEMOS with the command line
 
 import * as readline from "readline"
-import * as socket from "socket.io"
-import * as socket_client from "socket.io-client"
 
 import Client from "./libs/client_class"
 
@@ -40,8 +38,7 @@ async function main() {
         if (answer === "exit") {
             exit_flag = true
         } else {
-            //console.log(answer)
-            await parser(answer)
+            //            await parser(answer)
         }
     }
     rl.close()
@@ -64,15 +61,11 @@ async function parser(cmd: string) {
     // Now we can parse the command and dispatch things to the client class methods
     switch (cmd_type) {
         case "help":
-            console.log("Available commands:")
-            console.log("  help - Show this help")
-            console.log("  exit - Exit the client")
-            break
+                                                break
         case "connect":
             // NOTE Connecting to the server requires an url to be specified
             if (cmd_args.length === 0) {
-                console.log("You must specify an url to connect to!")
-                break
+                                break
             }
             await client.connect(cmd_args[0])
             break

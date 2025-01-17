@@ -88,12 +88,8 @@ export class DAHRFactory {
     deleteDAHR(sessionId: string): void {
         if (this._dahrs.has(sessionId)) {
             this._dahrs.delete(sessionId)
-            console.log(
-                `DAHR with sessionId ${sessionId} removed successfully.`,
-            )
-        } else {
-            console.log(`No DAHR found with sessionId ${sessionId}.`)
-        }
+                    } else {
+                    }
     }
 
     /**

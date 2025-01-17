@@ -48,9 +48,7 @@ export default async function executeOperations(
     operations: Operation[],
     block: Block = null,
 ): Promise<Map<string, Actor>> {
-    console.log("Executing operations")
-    //console.log("executeOperations", operations)
-    let results = new Map<string, Actor>()
+        //    let results = new Map<string, Actor>()
     // First of all we divide the operations into groups of addresses
     let groups: Map<string, Operation[]> = new Map()
     let sorted_groups = groups
@@ -95,8 +93,7 @@ async function executeSequence(
         // ANCHOR Dispatching the operation to the appropriate method
         switch (operations[i].operator) {
             case "genesis":
-                console.log("Genesis block: applying genesis operations")
-                result = await subOperations.genesis(operations[i], block)
+                                result = await subOperations.genesis(operations[i], block)
                 break
             case "transfer_native":
                 result = await subOperations.transferNative(operations[i])

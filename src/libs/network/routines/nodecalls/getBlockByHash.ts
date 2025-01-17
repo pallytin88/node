@@ -5,17 +5,13 @@ export default async function getBlockByHash(data: any) {
     let extra = ""
 
     if (!data.hash) {
-        console.log("[SERVER ERROR] Missing hash 💀")
-        response = "error"
+                response = "error"
         extra = "Missing hash"
         return { response, extra }
     }
-    console.log("[SERVER] Received getBlockByHash: " + data.hash)
-    response = await Chain.getBlockByHash(data.hash)
+        response = await Chain.getBlockByHash(data.hash)
     // REVIEW Debug lines
-    //console.log(response)
-    // response = JSON.stringify(response)
-    //console.log(response)
-    return { response, extra }
+    //    // response = JSON.stringify(response)
+    //    return { response, extra }
 
 }

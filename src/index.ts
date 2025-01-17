@@ -15,21 +15,19 @@ import "reflect-metadata"
 import * as dotenv from "dotenv"
 import * as fs from "fs"
 
-import { getSharedState } from "./utilities/sharedState"
-import { server_rpc } from "./libs/network" // NOTE This is started in warmup
 import terminalkit from "terminal-kit"
+import { server_rpc } from "./libs/network"; // NOTE This is started in warmup
+import { getSharedState } from "./utilities/sharedState"
 
 import findGenesisBlock from "./libs/blockchain/routines/findGenesisBlock"
 // import * as eiows from 'eiows';
 import { PeerManager } from "./libs/peer"
 // import commandLine from "./utilities/commandLine"
-import peerBootstrap from "./libs/peer/routines/peerBootstrap"
-import groundControl from "./libs/utils/demostdlib/groundControl"
-import mainLoop from "./utilities/mainLoop"
 import log from "src/utilities/logger"
 import { Peer } from "./libs/peer"
-import { getNetworkTimestamp } from "./libs/utils/calibrateTime"
+import peerBootstrap from "./libs/peer/routines/peerBootstrap"
 import getTimestampCorrection from "./libs/utils/calibrateTime"
+import mainLoop from "./utilities/mainLoop"
 
 const term = terminalkit.terminal
 
@@ -65,27 +63,23 @@ let indexState: {
 // ANCHOR Calibrating the time
 async function calibrateTime() {
     await getTimestampCorrection()
-    console.log("Timestamp correction: " + getSharedState.timestampCorrection)
-    console.log("Network timestamp: " + getNetworkTimestamp())
+        )
 }
 // ANCHOR Routine to handle parameters in advanced mode
 async function digestArguments() {
     let args = process.argv
     if (args.length > 3) {
-        console.log("digest arguments")
-        for (let i = 3; i < args.length; i++) {
+                for (let i = 3; i < args.length; i++) {
             // Handle simple commands
             if (!args[i].includes("=")) {
-                console.log("cmd: " + args[i])
-                process.exit(0)
+                                process.exit(0)
             }
             // Handle configurations
             let param = args[i].split("=")
             // NOTE These are all the parameters supported
             switch (param[0]) {
                 case "port":
-                    console.log("Overriding port")
-                    indexState.OVERRIDE_PORT = parseInt(param[1])
+                                        indexState.OVERRIDE_PORT = parseInt(param[1])
                     break
                 case "peerfile":
                     log.warning(
@@ -93,16 +87,13 @@ async function digestArguments() {
                     )
                     break
                 case "tester":
-                    console.log("Starting in tester mode")
-                    indexState.OVERRIDE_IS_TESTER = true
+                                        indexState.OVERRIDE_IS_TESTER = true
                     break
                 case "cli":
-                    console.log("Starting in cli mode")
-                    indexState.COMMANDLINE_MODE = true
+                                        indexState.COMMANDLINE_MODE = true
                     break
                 default:
-                    console.log("Invalid parameter: " + param)
-            }
+                                }
         }
     }
 }
@@ -117,8 +108,7 @@ async function warmup() {
     // INFO Loading the known peers
     if (!fs.existsSync("./demos_peerlist.json")) {
         indexState.enough_peers = false
-        console.log("No peers found, listening for peers...")
-    }
+            }
 
     // ANCHOR Overrides
     indexState.OVERRIDE_PORT = null
@@ -141,12 +131,7 @@ async function warmup() {
         process.env.EXPOSED_URL || "http://localhost:" + indexState.SERVER_PORT
     /* !SECTION Environment variables loading and configuration */
 
-    console.log("= Configured environment variables = \n")
-    console.log("PG_PORT: " + indexState.PG_PORT)
-    console.log("RPC_FEE: " + indexState.RPC_FEE)
-    console.log("SERVER_PORT: " + indexState.SERVER_PORT)
-    console.log("= End of Configuration = \n")
-    // Configure the logs directory
+                        // Configure the logs directory
     log.setLogsDir(indexState.SERVER_PORT)
     // ? REVIEW Starting the server_rpc: should we keep this async?
     // This should start the server_rpc without any other needed operation
@@ -154,8 +139,7 @@ async function warmup() {
     server_rpc()
 
     indexState.peerManager = PeerManager.getInstance()
-    console.log("[MAIN] peerManager started")
-
+    
     // Digest the arguments
     await digestArguments()
 }
@@ -192,16 +176,14 @@ async function preMainLoop() {
     term.green("[BOOTSTRAP] Loaded a list of peers:\n")
 
     for (const peer of indexState.PeerList) {
-        console.log(peer.identity + " @ " + peer.connection.string)
-    }
+            }
 
     // ANCHOR Getting the public IP to check if we're online
     try {
         await getSharedState.identity.getPublicIP()
         term.green("IP: " + getSharedState.identity.publicIP + "\n")
     } catch (e) {
-        console.log(e)
-        term.yellow("[WARN] {OFFLINE?} Failed to get public IP\n")
+                term.yellow("[WARN] {OFFLINE?} Failed to get public IP\n")
     }
 
     // ANCHOR Looking for the genesis block
@@ -215,8 +197,7 @@ async function preMainLoop() {
 
     // ANCHOR Bootstrapping the peers
     term.yellow("[BOOTSTRAP] 🌐 Bootstrapping peers...\n")
-    console.log(indexState.PeerList)
-    await peerBootstrap(indexState.PeerList)
+        await peerBootstrap(indexState.PeerList)
     // ? Remove the following code if it's not needed: indexState.peerManager.addPeer(peer) is called within peerBootstrap (hello_peer routines)
     /*for (const peer of peerList) {
         peerManager.addPeer(peer)
@@ -241,8 +222,7 @@ async function main() {
     // ANCHOR Based on the above methods, we can now start the main loop
     // Checking for listening mode
     if (indexState.peerManager.getPeers().length < 1) {
-        console.log("[WARNING] 🔍 No peers detected, listening...")
-        indexState.enough_peers = false
+                indexState.enough_peers = false
     }
     // TODO Enough_peers will be shared between modules so that can be checked async
     if (indexState.enough_peers) {

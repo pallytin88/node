@@ -1,12 +1,11 @@
 import { RPCResponse } from "@kynesyslabs/demosdk/types"
-import { emptyResponse } from "./server_rpc"
-import { getSharedState } from "src/utilities/sharedState"
-import { PeerManager, Peer } from "../peer"
-import log from "src/utilities/logger"
 import _ from "lodash"
-import * as forge from "node-forge"
+import log from "src/utilities/logger"
+import { getSharedState } from "src/utilities/sharedState"
 import Cryptography from "../crypto/cryptography"
+import { Peer, PeerManager } from "../peer"
 import { SyncData } from "../peer/Peer"
+import { emptyResponse } from "./server_rpc"
 
 export interface HelloPeerRequest {
     url: string
@@ -34,8 +33,7 @@ export async function manageHelloPeer(
         peerObject.identity ==
         getSharedState.identity.ed25519.publicKey.toString("hex")
     ) {
-        console.log("[Hello Peer Listener] Peer is us: skipping")
-        response.result = 200
+                response.result = 200
         response.response = true
         response.extra = {
             msg: "Peer is us: skipping",

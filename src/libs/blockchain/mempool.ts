@@ -20,11 +20,11 @@ import Hashing from "../crypto/hashing"
 import PeerManager from "../peer/PeerManager"
 import Block from "./block"
 // INFO Singleton Mempool class
-import Transaction from "./transaction"
 import { ISignature } from "@kynesyslabs/demosdk/types"
 import log from "src/utilities/logger"
 import { getSharedState } from "src/utilities/sharedState"
-import { ForgeToHex, HexToForge } from "../crypto/forgeUtils"
+import { ForgeToHex } from "../crypto/forgeUtils"
+import Transaction from "./transaction"
 
 class MempoolLock {
     locked: boolean
@@ -405,15 +405,12 @@ export default class Mempool {
                 "[MEMPOOL VERIFICATION] Public key: " +
                     public_key.data.toString("hex"),
             )
-            console.log("[DEBUG] tx_hash: (" + typeof tx_hash + ")")
-            console.log(tx_hash)
-            console.log(
-                "[DEBUG] signature.data: (" + typeof signature.data + ")",
+            ")
+                        ",
             )
-            console.log(signature.data.toString("hex"))
-            console.log("[DEBUG] public_key: (" + typeof public_key + ")")
-            console.log(public_key)
-            let signature_valid = Cryptography.verify(
+            )
+            ")
+                        let signature_valid = Cryptography.verify(
                 tx_hash,
                 ForgeToHex(signature.data),
                 ForgeToHex(public_key),

@@ -12,19 +12,19 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 // REVIEW Conflict handling between peers (longest chain)
 
-import { getSharedState } from "src/utilities/sharedState"
-import terminalkit from "terminal-kit"
-import Peer from "../../peer/Peer"
-import PeerManager from "../../peer/PeerManager"
-import Block from "../block"
-import Chain from "../chain"
-import log from "src/utilities/logger"
 import {
     RPCRequest,
     RPCResponse,
     Transaction,
 } from "@kynesyslabs/demosdk/types"
 import { BlockNotFoundError, PeerOfflineError } from "src/exceptions"
+import log from "src/utilities/logger"
+import { getSharedState } from "src/utilities/sharedState"
+import terminalkit from "terminal-kit"
+import Peer from "../../peer/Peer"
+import PeerManager from "../../peer/PeerManager"
+import Block from "../block"
+import Chain from "../chain"
 
 const term = terminalkit.terminal
 
@@ -202,8 +202,7 @@ async function verifyLastBlockIntegrity(
     let lastSyncedBlockResponse = await peer.call(lastSyncedBlockRequest, false)
 
     if (lastSyncedBlockResponse.result === 200) {
-        console.log("[fastSync] Last synced block response received")
-        let lastSyncedBlock = lastSyncedBlockResponse.response as Block
+                let lastSyncedBlock = lastSyncedBlockResponse.response as Block
         if (lastSyncedBlock.hash !== ourLastBlockHash) {
             log.info("[fastSync] Hash is not coherent")
             log.info("[fastSync] Our hash: " + ourLastBlockHash)
@@ -212,10 +211,7 @@ async function verifyLastBlockIntegrity(
             // TODO: Pass to the next peer
         }
 
-        console.log(
-            "[fastSync] Hash is coherent: we can sync with: " + peer.identity,
-        )
-    }
+            }
 
     return true
 }
@@ -246,10 +242,7 @@ async function downloadBlock(peer: Peer, blockToAsk: number) {
     }
 
     if (blockResponse.result === 200) {
-        console.log(
-            "[fastSync] Block response received for block: " + blockToAsk,
-        )
-        let block = blockResponse.response as Block
+                let block = blockResponse.response as Block
 
         if (!block) {
             log.error("[downloadBlock] Block not received")
@@ -257,10 +250,7 @@ async function downloadBlock(peer: Peer, blockToAsk: number) {
         }
 
         await Chain.insertBlock(block, [], null, false)
-        console.log(
-            "[fastSync] Block inserted successfully at the head of the chain!",
-        )
-
+        
         // REVIEW Merge the peerlist
         log.info("[fastSync] Merging peers from block: " + block.hash)
         let mergedPeerlist = await mergePeerlist(block)

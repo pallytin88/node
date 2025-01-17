@@ -1,13 +1,13 @@
 import type { BlockContent, EncryptedTransaction, Transaction } from "@kynesyslabs/demosdk/types"
+import { RPCResponse } from "@kynesyslabs/demosdk/types"
+import _ from "lodash"
 import * as forge from "node-forge"
+import log from "src/utilities/logger"
+import Chain from "../blockchain/chain"
 import Cryptography from "../crypto/cryptography"
 import Hashing from "../crypto/hashing"
-import { RPCResponse } from "@kynesyslabs/demosdk/types"
 import { emptyResponse } from "../network/server_rpc"
-import _ from "lodash"
 import Peer from "../peer/Peer"
-import Chain from "../blockchain/chain"
-import log from "src/utilities/logger"
 // SECTION L2PS Message types and interfaces
 
 export interface L2PSMessage {
@@ -178,12 +178,7 @@ export class Subnet {
         encryptedTransaction: EncryptedTransaction,
     ): Promise<Transaction> {
         if (!this.keypair || !this.keypair.privateKey) {
-            console.log(
-                "[L2PS] Subnet " +
-                    this.uid +
-                    " has no private key, cannot decrypt transaction",
-            )
-            return null
+                        return null
         }
         // ! TODO Clean the typing of Cryptography.rsa.decrypt
         let decryptedTransactionResponse = Cryptography.rsa.decrypt(encryptedTransaction.encryptedTransaction, this.keypair.privateKey)

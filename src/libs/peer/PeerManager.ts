@@ -15,16 +15,12 @@ import log from "src/utilities/logger"
 import { getSharedState } from "src/utilities/sharedState"
 import Cryptography from "../crypto/cryptography"
 import { HelloPeerRequest } from "../network/manageHelloPeer"
-import Peer, { SyncData } from "./Peer"
+import Peer from "./Peer"
 
 function ForgeToHex(forgeBuffer: any) {
-    console.log("[forge to string encoded]")
-    //console.log(forgeBuffer)
-    let rebuffer = Buffer.from(forgeBuffer)
+        //    let rebuffer = Buffer.from(forgeBuffer)
     forgeBuffer = rebuffer.toString("hex")
-    console.log("DECODED INTO:")
-    console.log("0x" + forgeBuffer)
-    return "0x" + forgeBuffer
+            return "0x" + forgeBuffer
 }
 
 export default class PeerManager {
@@ -108,30 +104,18 @@ export default class PeerManager {
     }
 
     private _getActors(peers: boolean, connections: boolean): Peer[] {
-        console.log("[PeerManager] Getting all peers...")
-        console.log("[PeerManager] peers: " + peers)
-        console.log("[PeerManager] connections: " + connections)
-
+                        
         const actorList: Peer[] = []
         const connectedList: Peer[] = []
         const authenticatedList: Peer[] = []
 
-        //console.log(this.peerList)
-        for (const peer in this.peerList) {
-            console.log("[PeerManager] Getting peer " + peer)
-            let _peer = this.peerList[peer]
-            console.log("[PeerManager] With url: " + _peer.connection.string)
-            // Filtering
+        //        for (const peer in this.peerList) {
+                        let _peer = this.peerList[peer]
+                        // Filtering
             if (_peer.identity != undefined) {
-                console.log(
-                    "[PEERMANAGER] This peer has an identity: treating it as an authenticated peer",
-                )
-                authenticatedList.push(_peer)
+                                authenticatedList.push(_peer)
             } else {
-                console.log(
-                    "[PEERMANAGER] This peer has no identity: treating it as a connection only peer",
-                )
-                connectedList.push(_peer)
+                                connectedList.push(_peer)
             }
         }
 
@@ -144,11 +128,7 @@ export default class PeerManager {
             actorList.push(...connectedList)
         }
 
-        console.log(
-            "[PEERMANAGER] Retrieved and filtered actor list length: " +
-                actorList.length,
-        )
-        return actorList
+                return actorList
     }
 
     // Creating a JSON object with the peerlist and logging it
@@ -218,8 +198,7 @@ export default class PeerManager {
         const existingPeer = this.peerList[identity]
 
         if (existingPeer) {
-            console.log("[PEERMANAGER] Peer already exists: updating it")
-            action = "updated"
+                        action = "updated"
 
             const { block, status } = existingPeer.sync
             const { timestamp, ready, online } = existingPeer.status
@@ -430,7 +409,7 @@ export default class PeerManager {
                 ":" +
                 peer.identity,
         )
-        //console.log(response) // ? Delete this if not needed
+        // // ? Delete this if not needed
         // TODO Test and Finish this
         // REVIEW is the message the response itself?
         log.debug("[Hello Peer] Response message: " + response.response)

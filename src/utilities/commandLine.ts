@@ -21,8 +21,7 @@ async function prompt(query = ""): Promise<string> {
 }
 
 export default async function commandLine(): Promise<any> {
-    console.log("This CLI client is in testing mode")
-    // Get input from user
+        // Get input from user
     let breaker = false
     input_loop: while (!breaker) {
         let raw_input = await prompt(NAME + " - " + VERSION + ":> ")
@@ -54,8 +53,7 @@ export default async function commandLine(): Promise<any> {
             case "quit":
                 break input_loop
             default:
-                console.log("Unknown command: " + input)
-                break
+                                break
         }
     }
     process.exit(0)

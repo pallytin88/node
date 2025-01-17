@@ -10,9 +10,8 @@ KyneSys Labs: https://www.kynesys.xyz/
 */
 
 import { NodeCall } from "src/libs/network/manageNodeCall"
-import Transmission from "../../communications/transmission"
-import Peer from "../Peer"
 import { getSharedState } from "src/utilities/sharedState"
+import Peer from "../Peer"
 
 // proxy method
 export async function verifyPeer(peer: Peer, expectedKey: string): Promise<Peer> {
@@ -30,10 +29,7 @@ export default async function getPeerIdentity(
     let id = getSharedState.identity.ed25519
     
     console.warn("[PEER AUTHENTICATION] Getting peer identity")
-    console.log(peer)
-    console.log(id)
-    console.log(expectedKey)
-
+            
     let node_call: NodeCall = {
         message: "getPeerIdentity",
         data: null,
@@ -45,23 +41,13 @@ export default async function getPeerIdentity(
         method: "nodeCall",
         params: [node_call],
     })
-    console.log("[PEER AUTHENTICATION] Response Received: " + JSON.stringify(response, null, 2))
+    )
     // Response management
     if (response.result === 200) {
-        console.log("[PEER AUTHENTICATION] Received response")
-        //console.log(response[1].identity.toString("hex"))
-        console.log(response.response)
-        if (response.response=== expectedKey) {
-            console.log("[PEER AUTHENTICATION] Identity is the expected one")
-        } else {
-            console.log(
-                "[PEER AUTHENTICATION] Identity is not the expected one",
-            )
-            console.log("Expected: ")
-            console.log(expectedKey)
-            console.log("Received: ")
-            console.log(response.response)
-            return null
+                //)
+                if (response.response=== expectedKey) {
+                    } else {
+                                                                        return null
         }
         // Adding the property to the peer
         peer.identity = response.response.identity // Identity is now known
@@ -72,8 +58,7 @@ export default async function getPeerIdentity(
         peer.verification.message = "getPeerIdentity routine verified"      
         peer.verification.timestamp = new Date().getTime()
     } else {
-        console.log("[PEER AUTHENTICATION] [FAILED] Response " + response.result + " received: " + response.response)
-        return null
+                return null
     }
     // ? Should we add it to the peerList here instead of in the peerBootstrap routine / hello_peer routine?
     return peer

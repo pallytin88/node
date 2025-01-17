@@ -15,6 +15,5 @@ export default function checkSignedPayloads(
         return false
     }
 
-    console.log("[XMScript Parser] Signed payload seems ok.")
-    return true
+        return true
 }

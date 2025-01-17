@@ -1,7 +1,7 @@
 // Defining a log class
 
-import { getSharedState } from "src/utilities/sharedState"
 import fs from "fs"
+import { getSharedState } from "src/utilities/sharedState"
 import terminalkit from "terminal-kit"
 const term = terminalkit.terminal
 
@@ -38,8 +38,7 @@ export default class log {
             term.red("Error creating logs directory:", error)
             this.LOGS_DIR = "logs"
         }
-        console.log("Logs directory set to:", this.LOGS_DIR)
-        this.LOG_INFO_FILE = this.LOGS_DIR + "/info.log"
+                this.LOG_INFO_FILE = this.LOGS_DIR + "/info.log"
         this.LOG_ERROR_FILE = this.LOGS_DIR + "/error.log"
         this.LOG_DEBUG_FILE = this.LOGS_DIR + "/debug.log"
         this.LOG_WARNING_FILE = this.LOGS_DIR + "/warning.log"
@@ -80,27 +79,10 @@ export default class log {
         cleanFile: boolean = false,
     ) {
         return
-        const logEntry = `[INFO] [${this.getTimestamp()}] ${message}\n`
-        if (this.logToTerminal[logfile] && logToTerminal) {
-            term.bold(logEntry.trim())
-        }
-
-        if (cleanFile) {
-            fs.rmSync(this.LOG_CUSTOM_PREFIX + logfile + ".log", {
-                force: true,
-            })
-            fs.writeFileSync(this.LOG_CUSTOM_PREFIX + logfile + ".log", "")
-        }
-        fs.appendFileSync(this.LOG_CUSTOM_PREFIX + logfile + ".log", logEntry)
     }
 
     static info(message: string, logToTerminal: boolean = true) {
         return
-        const logEntry = `[INFO] [${this.getTimestamp()}] ${message}\n`
-        if (logToTerminal) {
-            term.bold(logEntry.trim() + "\n")
-        }
-        fs.appendFileSync(this.LOG_INFO_FILE, logEntry)
     }
 
     static error(message: string, logToTerminal: boolean = true) {
@@ -114,22 +96,10 @@ export default class log {
 
     static debug(message: string, logToTerminal: boolean = true) {
         return
-        const logEntry = `[DEBUG] [${this.getTimestamp()}] ${message}\n`
-        if (logToTerminal) {
-            term.magenta(logEntry.trim() + "\n")
-        }
-        fs.appendFileSync(this.LOG_INFO_FILE, logEntry)
-        fs.appendFileSync(this.LOG_DEBUG_FILE, logEntry)
     }
 
     static warning(message: string, logToTerminal: boolean = true) {
         return
-        const logEntry = `[WARNING] [${this.getTimestamp()}] ${message}\n`
-        if (logToTerminal) {
-            term.yellow(logEntry.trim() + "\n")
-        }
-        fs.appendFileSync(this.LOG_INFO_FILE, logEntry)
-        fs.appendFileSync(this.LOG_WARNING_FILE, logEntry)
     }
 
     static critical(message: string, logToTerminal: boolean = true) {

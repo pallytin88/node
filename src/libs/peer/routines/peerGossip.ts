@@ -12,12 +12,12 @@
  * while minimizing unnecessary data transfer.
  */
 
+import { RPCRequest, RPCResponse } from "@kynesyslabs/demosdk/types"
+import Hashing from "src/libs/crypto/hashing"
 import log from "src/utilities/logger"
+import { getSharedState } from "src/utilities/sharedState"
 import Peer from "../Peer"
 import PeerManager from "../PeerManager"
-import { getSharedState } from "src/utilities/sharedState"
-import Hashing from "src/libs/crypto/hashing"
-import { RPCRequest, RPCResponse } from "@kynesyslabs/demosdk/types"
 
 const MAX_GOSSIP_PEERS = 10
 
@@ -233,8 +233,7 @@ async function requestPeerlistHashes(peers: Peer[]): Promise<RPCResponse[]> {
             log.warning(`[peerGossip] Peer has no identity: ${peer}`)
             continue
         }
-        console.log(`Sending peerlist hash request to ${peer.identity}`)
-        promises.push(peer.call(peerlistHashRequest))
+                promises.push(peer.call(peerlistHashRequest))
     }
     const responses = await Promise.all(promises)
     log.custom("peerGossip", "Received peerlist hashes", false)

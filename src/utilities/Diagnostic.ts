@@ -176,8 +176,7 @@ class Diagnostic {
             }
         >
     }> {
-        console.log("Starting system benchmark...")
-        progressBar.start(100, 0)
+                progressBar.start(100, 0)
 
         // Load requirements from .requirements file
         dotenv.config({ path: ".requirements" })
@@ -191,20 +190,16 @@ class Diagnostic {
             networkTestFileSize: Number(process.env.NETWORK_TEST_FILE_SIZE),
         }
 
-        console.log("Checking CPU...")
-        progressBar.update(20)
+                progressBar.update(20)
         const cpuResult = this.checkCPU(requirements.cpu)
 
-        console.log("Checking RAM...")
-        progressBar.update(40)
+                progressBar.update(40)
         const ramResult = this.checkRAM(requirements.ram)
 
-        console.log("Checking Disk...")
-        progressBar.update(60)
+                progressBar.update(60)
         const diskResult = this.checkDisk(requirements.disk)
 
-        console.log("Checking Network...")
-        const networkResult = await this.checkNetwork(
+                const networkResult = await this.checkNetwork(
             requirements.networkDownload,
             requirements.networkUpload,
             requirements.networkTestFileSize,
@@ -277,12 +272,10 @@ class Diagnostic {
         compliant: boolean
         value: { download: number; upload: number }
     }> {
-        console.log("Measuring download speed...")
-        progressBar.update(70)
+                progressBar.update(70)
         const downloadSpeed = await this.measureDownloadSpeed(testFileSizeBytes)
         
-        console.log("Measuring upload speed...")
-        progressBar.update(90)
+                progressBar.update(90)
         const uploadSpeed = await this.measureUploadSpeed(testFileSizeBytes)
 
         return {

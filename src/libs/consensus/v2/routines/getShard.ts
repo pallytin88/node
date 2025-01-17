@@ -1,9 +1,7 @@
-import { PeerManager } from "src/libs/peer"
-import { Peer } from "src/libs/peer"
 import Alea from "alea"
-import { getSharedState } from "src/utilities/sharedState"
+import { Peer, PeerManager } from "src/libs/peer"
 import log from "src/utilities/logger"
-import Chain from "src/libs/blockchain/chain"
+import { getSharedState } from "src/utilities/sharedState"
 
 export default async function getShard(seed: string): Promise<Peer[]> {
     // ! we need to get the peers from the last 3 blocks too
@@ -52,8 +50,7 @@ export default async function getShard(seed: string): Promise<Peer[]> {
     if (peers.length < 10) {
         maxShardSize = peers.length
     }
-    console.log("[getShard] maxShardSize: ", maxShardSize)
-    const shard: Peer[] = []
+        const shard: Peer[] = []
     log.custom("last_shard", "Shard seed is: " + seed)
     getSharedState.lastShardSeed = seed
     const random = Alea(seed)

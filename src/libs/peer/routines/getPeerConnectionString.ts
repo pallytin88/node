@@ -11,11 +11,9 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 // TODO Do the same but with connectionString
 
-import { Socket } from "socket.io"
 
-import Transmission from "../../communications/transmission"
-import Peer from "../Peer"
 import { NodeCall } from "src/libs/network/manageNodeCall"
+import Peer from "../Peer"
 
 export default async function getPeerConnectionString(
     peer: Peer,
@@ -32,11 +30,8 @@ export default async function getPeerConnectionString(
     })
     // Response management
     if (response.result === 200) {
-        console.log("[PEER CONNECTION] Received response")
-        //console.log(response[1])
-        peer.connection.string = response.response
+                //        peer.connection.string = response.response
     } else {
-        console.log("[PEER CONNECTION] Response " + response.result + " received: " + response.response)
-    }
+            }
     return peer
 }

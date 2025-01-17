@@ -1,5 +1,5 @@
 import * as ntpClient from "ntp-client"
-import sharedState, { getSharedState } from "src/utilities/sharedState"
+import { getSharedState } from "src/utilities/sharedState"
 
 const PRIMARY_NTP_SERVER = "pool.ntp.org"
 const FALLBACK_NTP_SERVERS = [
@@ -27,19 +27,15 @@ async function getMeasuredTimeDelta(): Promise<number> {
     const ntpTime = await getNtpTime()
     const endTime = Date.now()
     const roundTripTime = endTime - startTime
-    console.log("Round trip time:", roundTripTime)
-
+    
     const halfTripTime = Math.floor(roundTripTime / 2)
     const halfTripTimeInSeconds = Math.floor(halfTripTime / 1000)
-    console.log("Half trip time (ntp correction in seconds):", halfTripTimeInSeconds)
+    :", halfTripTimeInSeconds)
 
     const ntpTimeConsideringRoundTripTime = ntpTime - halfTripTimeInSeconds
     const localTime = Math.floor(Date.now() / 1000)
     const timeDelta = ntpTimeConsideringRoundTripTime - localTime
-    console.log("NTP time:", ntpTimeConsideringRoundTripTime)
-    console.log("Local time:", localTime)
-    console.log("Time delta:", timeDelta)
-    return timeDelta
+                return timeDelta
 }
 
 async function getNtpTime(): Promise<number> {

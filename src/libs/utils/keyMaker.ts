@@ -1,8 +1,7 @@
-import { getSharedState } from "src/utilities/sharedState"
-import { cryptography } from "../crypto"
 import fs from "fs"
-import terminalkit from "terminal-kit"
 import { pki } from "node-forge"
+import terminalkit from "terminal-kit"
+import { cryptography } from "../crypto"
 const term = terminalkit.terminal
 
 async function ensureIdentity(): Promise<pki.KeyPair> {
@@ -27,21 +26,17 @@ async function main() {
 
     if (forceNew && fs.existsSync(".demos_identity")) {
         fs.unlinkSync(".demos_identity")
-        console.log("Existing .demos_identity file deleted.")
-    }
+            }
 
     // Loading or generating the identity
     let identity = await ensureIdentity()
     const publicKey = identity.publicKey.toString("hex")
     const privateKey = identity.privateKey.toString("hex")
-    console.log("\n\n====\nPublic Key:", publicKey)
-    console.log("Private Key:", privateKey)
-    console.log("====\n\n")
-    // Save to file
+                // Save to file
     fs.writeFileSync("public.key", publicKey)
     fs.writeFileSync(".demos_identity", "0x" + privateKey)
     // Logging
-    console.log("Identity saved (or kept) to .demos_identity and public.key")
+     to .demos_identity and public.key")
 }
 
 main()

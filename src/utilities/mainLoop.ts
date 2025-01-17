@@ -3,6 +3,7 @@ import { fastSync } from "src/libs/blockchain/routines/Sync"
 import { consensusRoutine } from "src/libs/consensus/v2/PoRBFT"
 import { Peer, PeerManager } from "src/libs/peer"
 import checkOfflinePeers from "src/libs/peer/routines/checkOfflinePeers"
+import { peerGossip } from "src/libs/peer/routines/peerGossip"
 import Diagnostic, {
     DiagnosticData,
     DiagnosticResponse,
@@ -10,7 +11,6 @@ import Diagnostic, {
 import log from "src/utilities/logger"
 import * as consensusTime from "../libs/consensus/routines/consensusTime"
 import { getSharedState } from "./sharedState"
-import { peerGossip } from "src/libs/peer/routines/peerGossip"
 
 // INFO The main loop executed in background by index.ts
 async function sleep(time: number) {
@@ -217,8 +217,7 @@ async function logCurrentDiagnostics() {
     }
 
     // Print to console
-    console.log(diagnosticString)
-
+    
     // Log to file using log.custom
     log.custom("diagnostics", diagnosticString, false, true)
 }

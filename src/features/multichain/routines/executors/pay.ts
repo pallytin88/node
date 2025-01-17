@@ -18,21 +18,19 @@ export default async function handlePayOperation(
 ) {
     let result: TransactionResponse
 
-    console.log("[XMScript Parser] Pay task. Examining payloads (require 1)...")
+    ...")
     // NOTE For the following tasks we need to check the signed payloads against checkSignedPayloads()
 
     // NOTE Generic sanity check on payloads
     if (!checkSignedPayloads(1, operation.task.signedPayloads)) {
-        console.log(
-            "[XMScript Parser] Pay task failed: Invalid payloads (require 1 has 0)",
+        ",
         )
         return {
             result: "error",
             error: "Invalid signedPayloads length",
         }
     }
-    console.log(
-        "[XMScript Parser] Pay task payloads are ok: Valid payloads (require 1 has 1)",
+    ",
     )
     // ANCHOR EVM (which is quite simple: send a signed transaction. Done.)
     if (operation.is_evm) {
@@ -41,8 +39,7 @@ export default async function handlePayOperation(
     }
 
     // SECTION: Non EVM Section has more complexity
-    console.log("[XMScript Parser] Non-EVM PAY")
-
+    
     // ANCHOR Ripple
     const rpc_url =
         operation.rpc || chainProviders[operation.chain][operation.subchain]
@@ -89,9 +86,7 @@ export default async function handlePayOperation(
             }
     }
 
-    console.log("[XMScript Parser] Non-EVM PAY: result")
-    console.log(result)
-
+        
     // REVIEW is this ok here?
     return result
 }
@@ -106,10 +101,7 @@ async function genericJsonRpcPay(
     rpc_url: string,
     operation: IOperation,
 ) {
-    console.log([
-        `[XMScript Parser] Generic JSON RPC Pay on: ${operation.chain}.${operation.subchain}`,
-    ])
-    let instance: multichain.IBC
+        let instance: multichain.IBC
 
     try {
         instance = await sdk.create(rpc_url)
@@ -125,14 +117,10 @@ async function genericJsonRpcPay(
 
         // INFO: Send payload and return the result
         const result = await instance.sendTransaction(signedTx)
-        console.log("[XMScript Parser] Generic JSON RPC Pay: result: ")
-        console.log(result)
-
+                
         return result
     } catch (error) {
-        console.log("[XMScript Parser] Generic JSON RPC Pay: error: ")
-        console.log(error)
-        return {
+                        return {
             result: "error",
             error: error.toString(),
         }
@@ -142,15 +130,10 @@ async function genericJsonRpcPay(
  * Executes an EVM Pay operation and returns the result
  */
 async function handleEVMPay(chainID: number, operation: IOperation) {
-    console.log(
-        "[XMScript Parser] EVM Pay: trying to send the payload as a signed transaction...",
-    ) // REVIEW Simulations?
-    console.log(chainID)
-
-    console.log(operation.task.signedPayloads)
-
-    console.log(operation.task.signedPayloads[0])
-
+     // REVIEW Simulations?
+    
+    
+    
     let evmInstance = multichain.EVM.getInstance(chainID)
 
     if (!evmInstance) {
@@ -171,19 +154,10 @@ async function handleXRPLPay(
     rpc_url: string,
     operation: IOperation,
 ): Promise<TransactionResponse> {
-    console.log(
-        `[XMScript Parser] Ripple Pay: ${operation.chain} on ${operation.subchain}`,
-    )
-    console.log(
-        `[XMScript Parser] Ripple Pay: we will use ${rpc_url} to connect to ${operation.chain} on ${operation.subchain}`,
-    )
-    console.log(
-        "[XMScript Parser] Ripple Pay: trying to send the payload as a signed transaction...",
-    ) // REVIEW Simulations?
+             // REVIEW Simulations?
     let xrplInstance = new multichain.XRPL(rpc_url)
     const connected = await xrplInstance.connect()
-    console.log("CONNECT RETURNED: ", connected)
-
+    
     if (!connected) {
         return {
             result: "error",
@@ -197,30 +171,22 @@ async function handleXRPLPay(
         await new Promise(resolve => setTimeout(resolve, 300))
         timer += 300
         if (timer > 10000) {
-            console.log("[XMScript Parser] Ripple Pay: timeout")
-            return {
+                        return {
                 result: "error",
                 error: "Timeout in connecting to the XRP network",
             }
         }
     }
-    console.log("[XMScript Parser] Ripple Pay: connected to the XRP network")
-
+    
     try {
-        console.log("[XMScript Parser]: debugging operation")
-        console.log(operation.task)
-        console.log(JSON.stringify(operation.task))
+                        )
         const result = await xrplInstance.sendTransaction(
             operation.task.signedPayloads[0],
         )
-        console.log("[XMScript Parser] Ripple Pay: result: ")
-        console.log(result)
-
+                
         return result
     } catch (error) {
-        console.log("[XMScript Parser] Ripple Pay: error: ")
-        console.log(error)
-        return {
+                        return {
             result: "error",
             error: error,
         }

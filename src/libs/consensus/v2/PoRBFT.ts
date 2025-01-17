@@ -1,23 +1,23 @@
-import Transaction from "src/libs/blockchain/transaction"
-import getCommonValidatorSeed from "./routines/getCommonValidatorSeed"
-import Mempool from "src/libs/blockchain/mempool"
+import { ForgingExistingBlockError, NotInShardError } from "src/exceptions"
 import Block from "src/libs/blockchain/block"
 import Chain from "src/libs/blockchain/chain"
-import { getSharedState } from "src/utilities/sharedState"
-import { Peer } from "src/libs/peer"
-import log from "src/utilities/logger"
-import { mergeMempools } from "./routines/mergeMempools"
-import mergePeerlist from "./routines/mergePeerlist"
-import { createBlock } from "./routines/createBlock"
-import { orderTransactions } from "./routines/orderTransactions"
-import { broadcastBlockHash } from "./routines/broadcastBlockHash"
-import averageTimestamps from "./routines/averageTimestamp"
-import { fastSync } from "src/libs/blockchain/routines/Sync"
-import { getNetworkTimestamp } from "src/libs/utils/calibrateTime"
 import applyGCROperation from "src/libs/blockchain/gcr/gcr_routines/applyGCROperation"
 import { txToGCROperation } from "src/libs/blockchain/gcr/gcr_routines/txToGCROperation"
+import Mempool from "src/libs/blockchain/mempool"
+import { fastSync } from "src/libs/blockchain/routines/Sync"
+import Transaction from "src/libs/blockchain/transaction"
+import { Peer } from "src/libs/peer"
+import { getNetworkTimestamp } from "src/libs/utils/calibrateTime"
+import log from "src/utilities/logger"
+import { getSharedState } from "src/utilities/sharedState"
+import averageTimestamps from "./routines/averageTimestamp"
+import { broadcastBlockHash } from "./routines/broadcastBlockHash"
+import { createBlock } from "./routines/createBlock"
+import getCommonValidatorSeed from "./routines/getCommonValidatorSeed"
+import { mergeMempools } from "./routines/mergeMempools"
+import mergePeerlist from "./routines/mergePeerlist"
+import { orderTransactions } from "./routines/orderTransactions"
 import SecretaryManager from "./types/secretaryManager"
-import { ForgingExistingBlockError, NotInShardError } from "src/exceptions"
 
 /* INFO
 # Semaphore system
@@ -269,9 +269,7 @@ async function synchronizeAndAverageTime(shard: Peer[]): Promise<void> {
  */
 async function mergeAndOrderMempools(shard: Peer[]): Promise<Transaction[]> {
     const ourMempool = await Mempool.getMempool("mergeAndOrderMempools")
-    console.log("[consensusRoutine] Our mempool:")
-    console.log(ourMempool)
-    log.info("[consensusRoutine] Our mempool has been retrieved")
+            log.info("[consensusRoutine] Our mempool has been retrieved")
     const mergedMempool = await mergeMempools(ourMempool, shard)
     log.info("[consensusRoutine] Mempools have been merged")
     // await updateValidatorStatus("mergedMempool", true, false, true)
@@ -403,14 +401,12 @@ function isBlockValid(pro: number, totalVotes: number): boolean {
  */
 async function finalizeBlock(block: Block, pro: number): Promise<void> {
     log.info(`[consensusRoutine] Block is valid with ${pro} votes`)
-    console.log(block)
-    await Chain.insertBlock(block) // NOTE Transactions are added to the Transactions table here
+        await Chain.insertBlock(block) // NOTE Transactions are added to the Transactions table here
     //getSharedState.consensusMode = false
     ///getSharedState.inConsensusLoop = false
     log.info("[consensusRoutine] Block added to the chain")
     const lastBlock = await Chain.getLastBlock()
-    console.log(lastBlock)
-}
+    }
 
 /**
  * Sends our validator phase to the secretary, and waits for the greenlight.

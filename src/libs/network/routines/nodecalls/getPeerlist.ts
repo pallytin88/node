@@ -1,12 +1,11 @@
 import { Peer } from "src/libs/peer"
 
-import PeerManager from "../../../peer/PeerManager"
-import { getSharedState } from "src/utilities/sharedState"
 import log from "src/utilities/logger"
+import { getSharedState } from "src/utilities/sharedState"
+import PeerManager from "../../../peer/PeerManager"
 
 export default async function getPeerlist(): Promise<Peer[]> {
-    console.log("[SERVER] Executing getPeerlist")
-    // Getting our current peerlist
+        // Getting our current peerlist
     let socketized_response = PeerManager.getInstance().getPeers()
     let response = [] as Peer[]
 

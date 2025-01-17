@@ -46,8 +46,7 @@ export class Web2RequestManager {
         this.dahr.web2Request.raw.stage.hop_number += 1
 
         term.bold("[Web2Parser] Combined Attestation:\n")
-        console.log(combinedAttestation)
-
+        
         return combinedAttestation
     }
 
@@ -73,8 +72,7 @@ export class Web2RequestManager {
         const hashedCombined = Hashing.sha256(stringedCombined)
 
         term.bold("[Web2Parser] Combined hash:\n")
-        console.log(hashedCombined)
-
+        
         const signature = Cryptography.sign(
             hashedCombined,
             sharedState.getInstance().identity.ed25519.privateKey,
@@ -88,8 +86,7 @@ export class Web2RequestManager {
             valid: null,
         }
         term.bold("[Web2Parser] Combined Attestation:\n")
-        console.log(attestation)
-
+        
         const hexKey = sharedState
             .getInstance()
             .identity.ed25519.publicKey.toString("hex")

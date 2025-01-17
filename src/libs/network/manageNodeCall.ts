@@ -1,31 +1,25 @@
-import { RPCRequest, RPCResponse } from "@kynesyslabs/demosdk/types"
-import { emptyResponse } from "./server_rpc"
-import { Peer } from "../peer"
-import { Blocks } from "src/model/entities/Blocks"
-import Transaction from "../blockchain/transaction"
-import { AddressInfo } from "@kynesyslabs/demosdk/types"
+import { RPCResponse } from "@kynesyslabs/demosdk/types"
+import _ from "lodash"
+import { getSharedState } from "src/utilities/sharedState"
 import Chain from "../blockchain/chain"
-import { StatusNative } from "@kynesyslabs/demosdk/types"
 import GCR from "../blockchain/gcr/gcr"
 import eggs from "./routines/eggs"
-import { getSharedState } from "src/utilities/sharedState"
-import _ from "lodash"
+import { emptyResponse } from "./server_rpc"
 // Importing methods themselves
-import getPeerInfo from "./routines/nodecalls/getPeerInfo"
-import getPeerlist from "./routines/nodecalls/getPeerlist"
-import getPreviousHashFromBlockNumber from "./routines/nodecalls/getPreviousHashFromBlockNumber"
-import getPreviousHashFromBlockHash from "./routines/nodecalls/getPreviousHashFromBlockHash"
-import getBlockHeaderByNumber from "./routines/nodecalls/getBlockHeaderByNumber"
-import getBlockHeaderByHash from "./routines/nodecalls/getBlockHeaderByHash"
-import getBlockByNumber from "./routines/nodecalls/getBlockByNumber"
-import getBlockByHash from "./routines/nodecalls/getBlockByHash"
 import { Hashing } from "node_modules/@kynesyslabs/demosdk/build/encryption"
+import {
+    GlobalChangeRegistry
+} from "src/model/entities/GCR/GlobalChangeRegistry"
 import log from "src/utilities/logger"
 import HandleGCR from "../blockchain/gcr/handleGCR"
-import {
-    GlobalChangeRegistry,
-    GCRExtended,
-} from "src/model/entities/GCR/GlobalChangeRegistry"
+import getBlockByHash from "./routines/nodecalls/getBlockByHash"
+import getBlockByNumber from "./routines/nodecalls/getBlockByNumber"
+import getBlockHeaderByHash from "./routines/nodecalls/getBlockHeaderByHash"
+import getBlockHeaderByNumber from "./routines/nodecalls/getBlockHeaderByNumber"
+import getPeerInfo from "./routines/nodecalls/getPeerInfo"
+import getPeerlist from "./routines/nodecalls/getPeerlist"
+import getPreviousHashFromBlockHash from "./routines/nodecalls/getPreviousHashFromBlockHash"
+import getPreviousHashFromBlockNumber from "./routines/nodecalls/getPreviousHashFromBlockNumber"
 
 export interface NodeCall {
     message: string
@@ -44,8 +38,7 @@ export async function manageNodeCall(content: NodeCall): Promise<RPCResponse> {
     response.result = 200 // Until proven otherwise
     response.require_reply = false // Until proven otherwise
     response.extra = null // Until proven otherwise
-    //console.log(typeof data)
-    console.log(JSON.stringify(content))
+    //    )
     switch (content.message) {
         case "getPeerInfo":
             response.response = await getPeerInfo()
@@ -85,11 +78,9 @@ export async function manageNodeCall(content: NodeCall): Promise<RPCResponse> {
             response.extra = result.extra
             break
         case "getLastBlockNumber":
-            console.log("[SERVER] Received getLastBlockNumber")
-            response.response = await Chain.getLastBlockNumber()
-            console.log("[CHAIN.ts] Received reply from the database") // REVIEW Debug
-            //console.log(response)
-            break
+                        response.response = await Chain.getLastBlockNumber()
+             // REVIEW Debug
+            //            break
         case "getLastBlock":
             response.response = await Chain.getLastBlock()
             break
@@ -97,15 +88,12 @@ export async function manageNodeCall(content: NodeCall): Promise<RPCResponse> {
             response.response = await Chain.getLastBlockHash()
             break
         case "getBlockByNumber":
-            console.log(`get block by number ${data.blockNumber}`)
-            return await getBlockByNumber(data)
+                        return await getBlockByNumber(data)
         case "getBlockByHash":
             // Check if we have .hash or .blockHash
             if (data.hash) {
-                console.log(`get block by hash ${data.hash}`)
-            } else if (data.blockHash) {
-                console.log(`get block by hash ${data.blockHash}`)
-                data.hash = data.blockHash
+                            } else if (data.blockHash) {
+                                data.hash = data.blockHash
             } else {
                 response.result = 400
                 response.response = "No hash or blockHash specified"
@@ -126,8 +114,7 @@ export async function manageNodeCall(content: NodeCall): Promise<RPCResponse> {
                 response.response = "No hash specified"
                 break
             }
-            console.log(`getting tx with hash ${data.hash}`)
-            try {
+                        try {
                 response.response = await Chain.getTxByHash(data.hash)
             } catch (e) {
                 response.response = null
@@ -147,8 +134,7 @@ export async function manageNodeCall(content: NodeCall): Promise<RPCResponse> {
             // NOTE We don't need to sign anything as the headers are signed already
             response.response =
                 getSharedState.identity.ed25519.publicKey.toString("hex")
-            //console.log(response)
-            break
+            //            break
 
         // INFO Address info endpoint
         case "getAddressInfo":
@@ -212,12 +198,10 @@ export async function manageNodeCall(content: NodeCall): Promise<RPCResponse> {
         // NOTE Don't look past here, go away
         // INFO For real, nothing here to be seen
         case "hots":
-            console.log("[SERVER] Received hots")
-            response.response = eggs.hots()
+                        response.response = eggs.hots()
             break
         default:
-            console.log("[SERVER] Received unknown message")
-            // eslint-disable-next-line quotes
+                        // eslint-disable-next-line quotes
             response.response = '{ error: "Unknown message"}'
             break
     }

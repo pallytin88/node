@@ -1,4 +1,3 @@
-import { Hash } from "crypto"
 import SEAL from "node-seal"
 import { BatchEncoder } from "node-seal/implementation/batch-encoder"
 import { CipherText } from "node-seal/implementation/cipher-text"
@@ -11,7 +10,6 @@ import { KeyGenerator } from "node-seal/implementation/key-generator"
 import { PublicKey } from "node-seal/implementation/public-key"
 import { SEALLibrary } from "node-seal/implementation/seal"
 import { SecretKey } from "node-seal/implementation/secret-key"
-import Hashing from "src/libs/crypto/hashing"
 
 export default class FHE {
     public static instance: FHE
@@ -191,7 +189,7 @@ export default class FHE {
         try {
             return await this.evaluator[methodName](cipherText1, cipherText2)
         } catch (error) {
-            console.log("[FHE] Error: " + JSON.stringify(error))
+            )
             return null
         }
     }

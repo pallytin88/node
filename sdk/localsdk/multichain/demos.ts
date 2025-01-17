@@ -9,10 +9,8 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 */
 
-import * as socket_client from "socket.io-client"
-import Transmission from "src/libs/communications/transmission"
-import { NodeCall } from "src/libs/network/manageNodeCall"
 import { RPCResponse } from "@kynesyslabs/demosdk/types"
+import { NodeCall } from "src/libs/network/manageNodeCall"
 import { Peer } from "src/libs/peer"
 import terminalkit from "terminal-kit"
 
@@ -61,14 +59,12 @@ export default class Demos {
 
     // NOTE Get a block by its number eily
     getBlockByNumber(num: number) {
-        console.log("getBlockByNumber: num = " + num)
-        this.nodeCall("getBlockByNumber", { blockNumber: num })
+                this.nodeCall("getBlockByNumber", { blockNumber: num })
     }
 
     // NOTE Get a block by its hash
     getBlockByHash(hash: string) {
-        console.log("getBlockByHash called with hash", hash)
-        this.nodeCall("getBlockByHash", { hash: hash })
+                this.nodeCall("getBlockByHash", { hash: hash })
     }
 
     // NOTE Get the node mempool if authorized

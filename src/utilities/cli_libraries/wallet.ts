@@ -35,81 +35,62 @@ export default class Wallet {
     dispatch(divided_input: string[]) {
         // We need the modes (2 to 3 arguments)
         if (divided_input.length < 2 || divided_input.length > 3) {
-            console.log("Please specify a command")
-            return
+                        return
         }
         var mode = divided_input[1]
         switch (mode.toLowerCase()) {
             default:
-                console.log(
-                    "Please specify a valid mode between create and load",
-                )
-                break
+                                break
             // NOTE New wallet from scratch
             case "create":
                 if (divided_input.length > 2) {
-                    console.log("WARNING: Excess of arguments will be ignored")
-                }
+                                    }
                 try {
                     this.create()
-                    console.log("Wallet created successfully")
-                } catch (e) {
-                    console.log(e["message"])
-                }
+                                    } catch (e) {
+                                    }
                 break
             // NOTE Loading from an hex private key
             case "load":
                 if (divided_input.length < 3) {
-                    console.log("Please specify a private key in hex format")
-                    break
+                                        break
                 }
                 try {
                     this.load(divided_input[2])
-                    console.log("Wallet loaded successfully")
-                } catch (e) {
-                    console.log(e["message"])
-                }
+                                    } catch (e) {
+                                    }
                 break
             // NOTE Saving the wallet to a file
             case "save": // Requires an input from the user or default to a file
                 var filename: string
                 if (divided_input.length < 3) {
-                    console.log("Using default file name: wallet.demos")
-                    filename = "wallet.demos"
+                                        filename = "wallet.demos"
                 } else {
                     filename = divided_input[2]
                 }
                 // Writing to file
                 try {
                     this.save(filename)
-                    console.log("Wallet saved successfully")
-                } catch (e) {
-                    console.log(e["message"])
-                }
+                                    } catch (e) {
+                                    }
                 break
             // NOTE Reading from a file
             case "read": // Requires an input from the user or default to a file
                 var load_filename: string
                 if (divided_input.length < 3) {
-                    console.log(
-                        "Trying to read from default file name: wallet.demos",
-                    )
-                    load_filename = "wallet.demos"
+                                        load_filename = "wallet.demos"
                 } else {
                     load_filename = divided_input[2]
                 }
                 // Reading from file
                 try {
                     this.read(load_filename)
-                    console.log("Wallet read successfully")
-                } catch (e) {
-                    console.log(e["message"])
-                }
+                                    } catch (e) {
+                                    }
                 break
             // NOTE Showing the wallet
             case "show": // Shows the wallet
-                //console.log(this.identity)
-                break
+                //                break
         }
     }
 

@@ -1,7 +1,6 @@
-import Cryptography from "src/libs/crypto/cryptography"
 import { RPCResponse } from "@kynesyslabs/demosdk/types"
+import Cryptography from "src/libs/crypto/cryptography"
 import { Peer } from "src/libs/peer"
-import { demostdlib } from "src/libs/utils"
 import { getSharedState } from "src/utilities/sharedState"
 
 export async function proofConsensus(hash: string): Promise<[string, string]> {
@@ -12,17 +11,11 @@ export async function proofConsensus(hash: string): Promise<[string, string]> {
         .identity.ed25519.publicKey.toString("hex")
     // Signing the hash
 
-    console.log("publicHex")
-    console.log(publicHex)
-
-    console.log("WATMA")
-    console.log("pk: " + pk)
-    console.log(hash)
-
+        
+            
     const signature = Cryptography.sign(hash, pk)
 
-    console.log("signature")
-    console.log(signature.toString("hex"))
+        )
 
     const signatureHex = signature.toString("hex")
     // Adding the signature to the PoC
@@ -38,12 +31,9 @@ export async function proofConsensusHandler(hash: any): Promise<RPCResponse> {
         require_reply: true,
         extra: "",
     }
-    //console.log(raw_content)
-    // process.exit(0)
+    //    // process.exit(0)
     // REVIEW Check if the content is valid - Or maybe not
-    console.log("proofConsensusHandler")
-    //console.log(content)
-    let pocFullResponse = await proofConsensus(hash)
+        //    let pocFullResponse = await proofConsensus(hash)
     response.response = pocFullResponse[0]
     response.extra = pocFullResponse[1]
     return response
@@ -54,8 +44,7 @@ export async function askPoC(hash: string, peer: Peer): Promise<any> {
         method: "proofOfConsensus",
         params: [hash],
     }
-    console.log("[POC] Asking for PoC")
-    let response = await peer.call(poc_call)
+        let response = await peer.call(poc_call)
     if (response.result===200) {
         return response.response
     } else {
