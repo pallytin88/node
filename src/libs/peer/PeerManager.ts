@@ -279,6 +279,7 @@ export default class PeerManager {
         const peer = this.peerList[identity]
 
         if (!peer) {
+            log.error(getSharedState.identity.ed25519.publicKey.toString("hex"))
             log.error("[PEERMANAGER] Peer not found: " + identity)
             return
         }
@@ -316,6 +317,10 @@ export default class PeerManager {
     }
 
     getOurSyncDataForHeaders(identity: string) {
+        if (!identity) {
+            return ""
+        }
+
         const peer = this.peerList[identity]
 
         if (!peer) {
