@@ -48,7 +48,8 @@ KyneSys Labs: https://www.kynesys.xyz/
 import * as fs from "fs"
 import Hashing from "src/libs/crypto/hashing"
 import Datasource from "src/model/datasource"
-import { GCRExtended, GlobalChangeRegistry } from "src/model/entities/GCR/GlobalChangeRegistry"
+import { GlobalChangeRegistry } from "src/model/entities/GCR/GlobalChangeRegistry"
+import { GCRExtended } from "src/model/entities/GCR/GlobalChangeRegistry"
 import { Validators } from "src/model/entities/Validators"
 import terminalkit from "terminal-kit"
 import { LessThanOrEqual } from "typeorm"
@@ -282,9 +283,11 @@ export default class GCR {
             .getRepository(Validators)
 
         if (!blockNumber) {
-                        blockNumber = (await Chain.getLastBlock()).number // Ensure getLastBlock is also ported to TypeORM
+            console.log("No block number provided, getting the last one")
+            blockNumber = (await Chain.getLastBlock()).number // Ensure getLastBlock is also ported to TypeORM
         }
-        
+        console.log("blockNumber: " + blockNumber)
+
         try {
             const blockNodes = await validatorsRepository.find({
                 where: {
@@ -513,7 +516,8 @@ export default class GCR {
             })
 
             if (!nativeStatus) {
-                                nativeStatus = GCRRepository.create({
+                console.log("Creating new native status")
+                nativeStatus = GCRRepository.create({
                     publicKey: address,
                     details: {
                         hash: "",
@@ -531,7 +535,8 @@ export default class GCR {
                 await GCRRepository.save(nativeStatus)
             }
 
-            //            let tx_list = nativeStatus.details.content.txs || []
+            //console.log(nativeStatus.details.txs)
+            let tx_list = nativeStatus.details.content.txs || []
             tx_list.push(tx_hash)
 
             await GCRRepository.update(
@@ -548,12 +553,15 @@ export default class GCR {
                 },
             )
 
-            //            // TODO: Decide if we should use status_hashes too
+            //console.log(tx_list)
+            // TODO: Decide if we should use status_hashes too
             // Note: The original function returns responses from Chain.write, consider what you need to return here.
             return true // Adjust the return value as needed based on your requirements.
         } catch (e) {
             console.error("Error setting GCR native balance:", e)
-                                    return false
+            console.log("[GCR ERROR: NATIVE] ")
+            console.log(e)
+            return false
         }
     }
 

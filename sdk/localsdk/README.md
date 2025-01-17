@@ -3,6 +3,7 @@
 ## Multichain / Crosschain
 
 You can find all the supported chains by running
+console.log(multichain)
 As multichain is exported from multichain/ folder which exports all the supported chains
 
 ### Interoperability

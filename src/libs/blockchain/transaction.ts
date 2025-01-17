@@ -22,15 +22,15 @@ import forge from "node-forge"
 
 import {
     ISignature,
-    Transaction as ITransaction,
     RawTransaction,
+    Transaction as ITransaction,
     TransactionContent,
 } from "@kynesyslabs/demosdk/types"
 
 import Cryptography from "../crypto/cryptography"
-import { ForgeToHex } from "../crypto/forgeUtils"
 import Hashing from "../crypto/hashing"
 import Confirmation from "./types/confirmation"
+import { ForgeToHex } from "../crypto/forgeUtils"
 
 interface TransactionResponse {
     status: string
@@ -122,7 +122,14 @@ export default class Transaction implements ITransaction {
         publicKey: forge.pki.ed25519.BinaryBuffer,
         privateKey: forge.pki.ed25519.BinaryBuffer,
     ) {
-                                                                let confirmed =
+        console.log("[TRANSACTION]: confirmTx")
+        console.log("Public key: ")
+        console.log(publicKey)
+        console.log("Private key: ")
+        console.log(privateKey)
+        console.log("Signature: ")
+        console.log(tx.signature)
+        let confirmed =
             this.sanityCheck(tx) && this.isCoherent(tx) && this.structured(tx)
         if (confirmed) {
             let confirmation = new Confirmation()
@@ -140,23 +147,34 @@ export default class Transaction implements ITransaction {
 
     // INFO Checks the integrity of a transaction
     public static sanityCheck(tx: Transaction) {
-                                )
-                )
+        console.log("[sanityCheck] Checking the sanity of the tx")
+        console.log("Hash: " + tx.hash)
+        console.log("Signature: ")
+        console.log(ForgeToHex(tx.signature.data))
+        console.log("From: ")
+        console.log(ForgeToHex(tx.content.from))
         //let tx_content_hash = Hashing.sha256(JSON.stringify(tx.content))
         let _result = Cryptography.verify(
             tx.hash,
             ForgeToHex(tx.signature.data),
             ForgeToHex(tx.content.from),
         )
-                return _result
+        console.log("[sanityCheck] Sanity: " + _result)
+        return _result
     }
 
     // INFO Checking if the tx is coherent to the current state of the blockchain (and the txs pending before it)
     public static isCoherent(tx: Transaction) {
         let _result = true
-                let _derived_hash = Hashing.sha256(JSON.stringify(tx.content))
-                _result = _derived_hash == tx.hash
-                return _result
+        console.log(
+            "[isCoherent] Checking the coherence of the tx with hash: " +
+                tx.hash,
+        )
+        let _derived_hash = Hashing.sha256(JSON.stringify(tx.content))
+        console.log("[isCoherent] Derived hash: " + _derived_hash)
+        _result = _derived_hash == tx.hash
+        console.log("[isCoherent] Coherence: " + _result)
+        return _result
     }
 
     // INFO Checking if a tx has all the necessary informations
@@ -170,7 +188,16 @@ export default class Transaction implements ITransaction {
         tx: Transaction,
         status: string = "confirmed",
     ): RawTransaction {
-                                                        
+        console.log("[toRawTransaction] attempting to create a raw tx")
+        console.log(
+            "[toRawTransaction] Signature: ",
+        )
+        console.log(tx.signature.data)
+        console.log("[toRawTransaction] Block number: " + tx.blockNumber)
+        console.log("[toRawTransaction] Status: " + status)
+        console.log("[toRawTransaction] Hash: " + tx.hash)
+        console.log("[toRawTransaction] Type: " + tx.content.type)
+
         // NOTE From and To can be either a string or a Buffer
         if (tx.content.to["data"]?.toString("hex")) {
             tx.content.to = tx.content.to["data"]?.toString("hex")
@@ -179,7 +206,9 @@ export default class Transaction implements ITransaction {
             tx.content.from = tx.content.from["data"]?.toString("hex")
         }
 
-                        const rawTx = {
+        console.log("[toRawTransaction] From: " + tx.content.from)
+        console.log("[toRawTransaction] To: " + tx.content.to)
+        const rawTx = {
             blockNumber: tx.blockNumber,
             signature: JSON.stringify(tx.signature.data), // REVIEW This is a horrible thing, if it even works
             status: status,
@@ -200,9 +229,11 @@ export default class Transaction implements ITransaction {
     }
 
     public static fromRawTransaction(rawTx: RawTransaction): Transaction {
-                const tx = new Transaction()
+        console.log("[fromRawTransaction] Attempting to create a transaction from a raw transaction with hash: " + rawTx.hash)
+        const tx = new Transaction()
 
-        
+        console.log(rawTx)
+
         tx.blockNumber = rawTx.blockNumber
         tx.signature = {
             type: "ed25519", // Assuming the signature type as ed25519; adjust accordingly

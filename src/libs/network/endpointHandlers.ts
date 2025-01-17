@@ -12,34 +12,44 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 // REVIEW Pay attention to the return types (RPCResponse)
 
-import _ from "lodash"
 import Chain from "src/libs/blockchain/chain"
 import Mempool, { MempoolData } from "src/libs/blockchain/mempool"
+import { confirmTransaction } from "src/libs/blockchain/routines/validateTransaction"
 import Transaction from "src/libs/blockchain/transaction"
 import Cryptography from "src/libs/crypto/cryptography"
 import Hashing from "src/libs/crypto/hashing"
-import { getSharedState } from "src/utilities/sharedState"
 import handleL2PS from "./routines/transactions/handleL2PS"
+import { getSharedState } from "src/utilities/sharedState"
+import _ from "lodash"
 // NOTE Terminal kit for useful logging
+import terminalkit from "terminal-kit"
 import {
-    ConsensusRequest,
     ExecutionResult,
-    RPCResponse,
+    IWeb2Request,
     ValidityData,
-    XMScript
+    XMScript,
+    ConsensusRequest,
+    RPCResponse,
 } from "@kynesyslabs/demosdk/types"
+import GCR from "../blockchain/gcr/gcr"
+import { GlobalChangeRegistry } from "src/model/entities/GCR/GlobalChangeRegistry"
+import Block from "../blockchain/block"
+import { BlockContent } from "../../../../sdks/src/types/blockchain/blocks"
+import getPeerInfo from "./routines/nodecalls/getPeerInfo"
+import forge from "node-forge"
 import PeerManager from "src/libs/peer/PeerManager"
 import log from "src/utilities/logger"
-import terminalkit from "terminal-kit"
 import { emptyResponse } from "./server_rpc"
 // SECTION Handlers for different types of transactions
-import multichainCapabilities from "sdk/localsdk/multichain/types/multichainCapabilities"
 import handleDemosWorkRequest from "./routines/transactions/demosWork/handleDemosWorkRequest"
+import multichainCapabilities from "sdk/localsdk/multichain/types/multichainCapabilities"
+import multichainDispatcher from "src/features/multichain/XMDispatcher" // ? Rename to handleXMRequest
 
 // ? Note: this is to be implemented once demosWork is in place
 import { DemoScript } from "@kynesyslabs/demosdk/types"
 import { ForgeToHex } from "../crypto/forgeUtils"
 import { Peer } from "../peer"
+import { response } from "express"
 
 /* // ! Note: this will be removed once demosWork is in place
 import {
@@ -69,8 +79,10 @@ export default class ServerHandlers {
              * TODO Add signatures to validation data
              * The validation data can be used by the client to effectively execute the tx
              */
-            //            validationData = await confirmTransaction(tx)
-            //        } catch (e) {
+            //console.log(fname + "Validating transaction...")
+            validationData = await confirmTransaction(tx)
+            //console.log(fname + "Fetching result...")
+        } catch (e) {
             term.red.bold("[TX VALIDATION ERROR] 💀 : ")
             term.red(e)
             validationData = {
@@ -106,7 +118,8 @@ export default class ServerHandlers {
         validatedData: ValidityData,
     ): Promise<ExecutionResult> {
         // Log the entire validatedData object to inspect its structure
-        
+        console.log("[handleExecuteTransaction] Validated Data:", validatedData)
+
         let fname = "[handleExecuteTransaction] "
         let result: ExecutionResult = {
             success: true,
@@ -119,21 +132,42 @@ export default class ServerHandlers {
         let ourKey = getSharedState.identity.ed25519.publicKey
         let hexOurKey = ourKey.toString("hex")
         let dataKey = _.cloneDeep(validatedData.rpc_public_key)
-                        /*                           */
+        console.log("validatedData.rpc_public_key:  ")
+        console.log(validatedData.rpc_public_key)
+        /*  console.log("[handleExecuteTransaction] dataKey: ")
+        console.log(dataKey)
+        console.log(typeof dataKey)
+        console.log("\n") */
         let hexDataKey: string
         if (typeof dataKey === "string") {
-                        hexDataKey = dataKey
+            console.log(
+                "[handleExecuteTransaction] dataKey is a string: using as is",
+            )
+            hexDataKey = dataKey
         } else {
-                                    hexDataKey = ForgeToHex(dataKey)
+            console.log(
+                "[handleExecuteTransaction] dataKey is a buffer: using ForgeToHex",
+            )
+            console.log(dataKey)
+            hexDataKey = ForgeToHex(dataKey)
         }
-                let dataSignature = validatedData.signature
+        console.log("dataKey: " + hexDataKey)
+        let dataSignature = validatedData.signature
         let hexDataSignature: string
         if (typeof dataSignature === "string") {
-                        hexDataSignature = dataSignature
+            console.log(
+                "[handleExecuteTransaction] dataSignature is a string: using as is",
+            )
+            hexDataSignature = dataSignature
         } else {
-                                    hexDataSignature = ForgeToHex(dataSignature)
+            console.log(
+                "[handleExecuteTransaction] dataSignature is a buffer: using ForgeToHex",
+            )
+            console.log(dataSignature)
+            hexDataSignature = ForgeToHex(dataSignature)
         }
-                let queriedTx = _.cloneDeep(validatedData.data.transaction) // dataManipulation.copyCreate(validatedData.data.transaction)
+        console.log("dataSignature: " + hexDataSignature)
+        let queriedTx = _.cloneDeep(validatedData.data.transaction) // dataManipulation.copyCreate(validatedData.data.transaction)
         // REVIEW Correct? If the transaction has no block number, we set it to the last block number + 1
         if (!queriedTx.blockNumber) {
             log.warning(
@@ -147,10 +181,17 @@ export default class ServerHandlers {
                     queriedTx.blockNumber,
             )
         }
-                // queriedTx.content.from = queriedTx?.content?.from?.toString()
+        console.log(
+            "[handleExecuteTransaction] Queried tx processing in block: " +
+                queriedTx.blockNumber,
+        )
+        // queriedTx.content.from = queriedTx?.content?.from?.toString()
         // queriedTx.content.from = queriedTx?.content?.to?.toString()
 
-        
+        console.log(
+            "[SERVER] Received transaction for execution: " + queriedTx.hash,
+        )
+
         // We need to have issued the validity data
         if (hexDataKey !== hexOurKey) {
             term.red.bold(
@@ -164,8 +205,11 @@ export default class ServerHandlers {
         }
         // Also the signature must be valid
         let hashedData = Hashing.sha256(JSON.stringify(validatedData.data))
-        )
-                                let signatureValid = Cryptography.verify(
+        console.log(JSON.stringify(validatedData))
+        console.log("Backend - Hash:", hashedData)
+        console.log("Backend - Data Signature:", hexDataSignature)
+        console.log("Backend - Data Key:", hexDataKey)
+        let signatureValid = Cryptography.verify(
             hashedData,
             hexDataSignature, // REVIEW use dataSignature if needed
             hexDataKey, // REVIEW use dataKey if needed
@@ -223,7 +267,9 @@ export default class ServerHandlers {
             // SECTION Legacy code // ! Remove this once demosWork is in place
             case "crosschainOperation":
                 payload = tx.content.data
-                                                // TODO Better types on answers
+                console.log("[Included XM Chainscript]")
+                console.log(payload[1])
+                // TODO Better types on answers
                 var xm_result = await ServerHandlers.handleXMChainOperation(
                     payload[1] as XMScript,
                 )
@@ -260,8 +306,16 @@ export default class ServerHandlers {
         // Only if the transaction is valid we add it to the mempool
         if (result.success) {
             // REVIEW We add the transaction to the mempool
-                        await Mempool.addTransaction(queriedTx)
-                        // TODO Check if Operation(s) are added to the GCR too
+            console.log(
+                "[handleExecuteTransaction] Adding tx with hash: " +
+                    queriedTx.hash +
+                    " to the mempool",
+            )
+            await Mempool.addTransaction(queriedTx)
+            console.log(
+                "[handleExecuteTransaction] Transaction added to mempool",
+            )
+            // TODO Check if Operation(s) are added to the GCR too
             // FIXME Add an operation for the nonce or anyway a way to manage the nonce
         }
         // TODO Broadcast the tx to the other peers (or maybe not, consensus should take care of it)
@@ -283,9 +337,11 @@ export default class ServerHandlers {
          * An operation for the gas is also pushed it pn the GCR.
          * The tx is pushed in the mempool if applicable.
          */
-                // REVIEW Remember that crosschain operations can be in chainscript syntax
+        console.log("[XMChain] Handling XM Chain Operation...")
+        // REVIEW Remember that crosschain operations can be in chainscript syntax
         // INFO Use the src/features/multichain/chainscript/chainscript.chs for the specs
-        //        response = await multichainDispatcher.digest(xmscript)
+        //console.log(content.data)
+        response = await multichainDispatcher.digest(xmscript)
         // TODO
         return response
     }
@@ -322,7 +378,11 @@ export default class ServerHandlers {
     ): Promise<RPCResponse> {
         let response: RPCResponse = _.cloneDeep(emptyResponse)
         let senderIdentity = request.sender
-        //        /**/
+        //console.log("[SERVER] Received consensus request")
+        /*console.log(
+            "[SERVER] Peer identity information received: " +
+                senderIdentity,
+        )*/
         if (!getSharedState.consensusMode) {
             log.error("[endpointHandlers] We are not in consensus mode")
             response.result = 400
@@ -332,7 +392,8 @@ export default class ServerHandlers {
             return response
         }
 
-        //
+        //console.log("we are in consensus mode")
+
         let authorized = false
         let senderPublicKey = senderIdentity
 
@@ -345,7 +406,9 @@ export default class ServerHandlers {
             response.extra = "No shard found in shared state"
             return response
         }
-        //        //
+        //console.log("[SERVERHANDLER] Shard found in shared state")
+        //console.log(shard)
+
         const peerList = shard
 
         // Authorizing the sender
@@ -370,10 +433,12 @@ export default class ServerHandlers {
                 response.response = await Mempool.getMempool(
                     "ServerHandlers.getMempool",
                 )
-                //                response.result = 200
+                //console.log(response)
+                response.result = 200
                 response.require_reply = false
                 response.extra = "Mempool received"
-                //                return response
+                //console.log("[SERVERHANDLER] Received mempool")
+                return response
 
             default:
                 log.error("[endpointHandlers] Unknown message")

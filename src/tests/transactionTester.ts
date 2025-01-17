@@ -1,6 +1,7 @@
 import forge from "node-forge"
 import Transaction from "src/libs/blockchain/transaction"
 
+import Identity from "../libs/identity/identity"
 import testingEnvironment from "./types/testingEnvironment"
 
 const term = require("terminal-kit").terminal
@@ -11,11 +12,13 @@ async function main() {
     // Welcome
     term.brightBlack.bgWhite("[DEMOS INFRASTRUCTURE TESTING SUITE]\n")
     term.brightBlack.bgWhite("Welcome\n\n")
-        // TODO Make it .env-ized
+    console.log("[*] Loading identity and creating a tx...")
+    // TODO Make it .env-ized
     const our_identity = forge.pki.ed25519.generateKeyPair()
     const receiver_identity = forge.pki.ed25519.generateKeyPair()
     term.green("[+] Identity created\n")
-        let tx = await createTransaction(
+    console.log("[*] Creating a transaction...")
+    let tx = await createTransaction(
         1,
         "demoswork",
         our_identity.publicKey,
@@ -24,7 +27,8 @@ async function main() {
         our_identity.privateKey,
     )
     term.green("[+] Transaction created\n")
-        term.green("[+] Transaction ready to be broadcasted\n")
+    console.log(tx)
+    term.green("[+] Transaction ready to be broadcasted\n")
     // TODO ^
 }
 

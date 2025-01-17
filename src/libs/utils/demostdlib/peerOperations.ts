@@ -7,7 +7,8 @@ export async function createConnectedSocket(
         const socket = io(connectionString)
 
         socket.on("connect", () => {
-                        resolve(socket)
+            console.log(`[SOCKET CONNECTOR] Connected to ${connectionString}`)
+            resolve(socket)
         })
 
         socket.on("connect_error", err => {

@@ -5,8 +5,10 @@ export function ForgeToHex(forgeBuffer: any): string {
             forgeBuffer = forgeBuffer.data
         }
     } catch (e) {
-            }
-    //    let rebuffer = Buffer.from(forgeBuffer)
+        console.log("[ForgeToHex] Not a buffer")
+    }
+    //console.log(forgeBuffer)
+    let rebuffer = Buffer.from(forgeBuffer)
     forgeBuffer = rebuffer.toString("hex")
     return forgeBuffer
 }
@@ -18,7 +20,9 @@ export function HexToForge(forgeString: string): Uint8Array {
         forgeString = forgeString.slice(2)
     }*/
     let finalArray = new Uint8Array(64)
-    //    //    for (let i = 0; i < forgeString.length; i += 2) {
+    //console.log("[string to forge encoded]")
+    //console.log(forgeString)
+    for (let i = 0; i < forgeString.length; i += 2) {
         const hexValue = forgeString.substr(i, 2)
         const decimalValue = parseInt(hexValue, 16)
         finalArray[i / 2] = decimalValue
@@ -31,11 +35,14 @@ export function HexToForge(forgeString: string): Uint8Array {
     }
     // NOTE This is an horrible, yet working solution to the above problem
     if (trimmedArray.length == 63 || trimmedArray.length == 31) {
-                var _finalArray = new Uint8Array(trimmedArray.length + 1)
+        console.log("[HexToForge] Suspicious length: " + trimmedArray.length)
+        var _finalArray = new Uint8Array(trimmedArray.length + 1)
         for (let i = 0; i < trimmedArray.length; i++) {
             _finalArray[i] = trimmedArray[i]
         }
         trimmedArray = _finalArray  
     }
-    //    //    return trimmedArray
+    //console.log("[HexToForge] Encoded into an Uint8Array of lenght: " + finalArray.length)
+    //console.log(trimmedArray)
+    return trimmedArray
 }

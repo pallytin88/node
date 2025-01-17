@@ -1,4 +1,5 @@
 import * as fs from "fs"
+import * as path from "path"
 
 export interface EVMInfo {
     name: string
@@ -12,9 +13,11 @@ export interface EVMInfo {
 export default function evmInfo(chainID: number): [boolean, string | EVMInfo] {
     let composedName = "eip155-" + String(chainID) + ".json"
     let filePath = "data/evmChains/" + composedName
-        // Check if the file exists
+    console.log(composedName)
+    // Check if the file exists
     if (fs.existsSync(filePath)) {
-                // Read the file
+        console.log("File exists")
+        // Read the file
         let rawdata = fs.readFileSync(filePath)
         // Parse the file
         let data = JSON.parse(rawdata.toString())
@@ -26,10 +29,12 @@ export default function evmInfo(chainID: number): [boolean, string | EVMInfo] {
             features: data.features,
             nativeCurrency: data.nativeCurrency,
         }
-                // Return the data
+        console.log(info)
+        // Return the data
         return [true, info]
     } else {
-                // Return an error
+        console.log("ChainID not found")
+        // Return an error
         return [false, "ChainID not found"]
     }
 }

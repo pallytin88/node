@@ -13,7 +13,10 @@ export default async function getBlockHeaderByNumber(data: any) {
         return { response, extra }
     }
     response = await Chain.getBlockByNumber(data.blockNumber)
-        // FIXME Implement the extraction of the header
+    console.log(
+        "[CHAIN.ts] Received reply from the database: extracting header",
+    )
+    // FIXME Implement the extraction of the header
     // response = response.getHeader()
     return { response, extra }
 }

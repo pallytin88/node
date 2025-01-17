@@ -1,7 +1,9 @@
 // INFO To safely transition from L2 (IMP) to L1 (DEMOS) it is necessary to have a wrapper that interprets the results
+import { Hash } from "crypto"
 // The outcome of this method can be feed to GCR.addToGCRIMPData
 import { IMMessage } from "src/features/InstantMessagingProtocol/types/IMSession"
 import Cryptography from "src/libs/crypto/cryptography"
+import { ForgeToHex, HexToForge } from "src/libs/crypto/forgeUtils"
 import Hashing from "src/libs/crypto/hashing"
 
 export default async function registerIMPData(
@@ -23,7 +25,9 @@ export default async function registerIMPData(
             signature,
             message.message.from,
         )
-        ,
+        console.log(
+            "[IMPRegistering] Invalid signature for message: " +
+                JSON.stringify(message),
         )
         if (!verified) {
             return [status, "Invalid signature"]

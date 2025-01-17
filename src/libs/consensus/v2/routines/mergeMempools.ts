@@ -1,5 +1,6 @@
 import { RPCResponse } from "@kynesyslabs/demosdk/types"
-import Mempool, { MempoolData } from "src/libs/blockchain/mempool"
+import Mempool from "src/libs/blockchain/mempool"
+import { MempoolData } from "src/libs/blockchain/mempool"
 import { Peer } from "src/libs/peer"
 import log from "src/utilities/logger"
 
@@ -31,5 +32,7 @@ export async function mergeMempools(
     log.info("[mergeMempools] Merging mempools is complete")
     // We call getMempool again to make sure we have the latest version that should have the merged mempools
     let mergedMempool = await Mempool.getMempool("mergeMempools")
-            return mergedMempool
+    console.log("[mergeMempools] Merged mempool:")
+    console.log(mergedMempool)
+    return mergedMempool
 }

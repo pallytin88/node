@@ -1,20 +1,20 @@
 // ! This file is deprecated: move everything to SecretaryManager.ts
 
 import { RPCRequest, RPCResponse } from "@kynesyslabs/demosdk/types"
-import _ from "lodash"
-import { Cryptography } from "node_modules/@kynesyslabs/demosdk/build/encryption"
-import { HexToForge } from "src/libs/crypto/forgeUtils"
-import { emptyResponse } from "src/libs/network/server_rpc"
-import { Peer } from "src/libs/peer"
-import log from "src/utilities/logger"
 import { getSharedState } from "src/utilities/sharedState"
+import { emptyResponse } from "src/libs/network/server_rpc"
+import _ from "lodash"
+import { Peer } from "src/libs/peer"
 import {
-    emptyValidatorPhase,
     emptyValidatorStatus,
     getShardManager,
-    ValidatorPhase,
     ValidatorStatus,
+    ValidatorPhase,
+    emptyValidatorPhase,
 } from "./shardManager"
+import log from "src/utilities/logger"
+import { Cryptography } from "node_modules/@kynesyslabs/demosdk/build/encryption"
+import { HexToForge } from "src/libs/crypto/forgeUtils"
 
 /** NOTE
  * This class is used both by the secretary itself and the other shard partecipants.
@@ -122,7 +122,10 @@ class Secretary {
         waitStatus: boolean,
         signature: string,
     ): Boolean {
-                // Checking the signature against the peerKey
+        console.log(
+            "[setWaitStatus] Received setWaitStatus request: processing",
+        )
+        // Checking the signature against the peerKey
         let isValid = Cryptography.verify(
             peerKey,
             HexToForge(signature),
@@ -135,7 +138,8 @@ class Secretary {
             )
             return false
         }
-                // Ensuring the peerKey is in the statuses
+        console.log("[setWaitStatus] The wait status request seems valid")
+        // Ensuring the peerKey is in the statuses
         if (!this.phaseStatus.has(peerKey)) {
             this.phaseStatus.set(peerKey, _.cloneDeep(emptyValidatorPhase))
         }
@@ -217,7 +221,8 @@ class Secretary {
             true,
             true,
         )
-                return this.status
+        console.log(this.status)
+        return this.status
     }
 
     /* SECTION Control methods */

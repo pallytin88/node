@@ -1,11 +1,11 @@
 // INFO Entry file for handling web2 requests
-import { IWeb2Request } from "@kynesyslabs/demosdk/types"
-import { DAHRFactory } from "src/features/web2/dahr/DAHRFactory"
 import Cryptography from "src/libs/crypto/cryptography"
 import Hashing from "src/libs/crypto/hashing"
 import required from "src/utilities/required"
 import sharedState from "src/utilities/sharedState"
+import { IWeb2Request } from "@kynesyslabs/demosdk/types"
 import { Web2RequestManager } from "./Web2RequestManager"
+import { DAHRFactory } from "src/features/web2/dahr/DAHRFactory"
 
 import terminalKit from "terminal-kit"
 import { DAHR } from "./dahr/DAHR"
@@ -29,17 +29,24 @@ export async function handleWeb2(
     web2Request: IWeb2Request,
 ): Promise<string | DAHR> {
     // TODO Remember that web2 could need to be signed and could need a fee
-        
-    
+    console.log("[PAYLOAD FOR WEB2] [*] Received a Web2 Payload.")
+    console.log("[PAYLOAD FOR WEB2] [*] Beginning sanitization checks...")
+
+    console.log(
+        "[REQUEST FOR WEB2] [+] Found and loaded payload.message as expected...",
+    )
+
     try {
         const dahrFactoryInstance = DAHRFactory.instance
         const dahr = dahrFactoryInstance.createDAHR(web2Request)
         const web2RequestManager = new Web2RequestManager(dahr)
 
-        
+        console.log("[handleWeb2] DAHR instance created.")
+
         const numOfAttestations = Object.keys(web2Request.attestations).length
         const originalFlag = numOfAttestations === 1
-        
+        console.log("[handleWeb2] Number of attestations: " + numOfAttestations)
+
         /**
          * Original RPC logic
          *
@@ -47,7 +54,10 @@ export async function handleWeb2(
          *
          */
         if (originalFlag) {
-                        try {
+            console.log(
+                "[handleWeb2] This is the original rpc. We will wait for attestations.",
+            )
+            try {
                 term.yellow(
                     "[handleWeb2] [*] Waiting for the required quorum for this chain of trust...",
                 )
@@ -82,7 +92,7 @@ export async function handleWeb2(
                 dahr.web2Request.hash = hashedAttestations
                 dahr.web2Request.signature = signedAttestations
             } catch (error) {
-                )
+                console.log("[handleWeb2] Error: " + JSON.stringify(error))
                 return JSON.stringify(error)
             }
         } else {
@@ -93,7 +103,13 @@ export async function handleWeb2(
             // TODO we have to merge the attestations' arrays with valid values
         }
 
-                
+        console.log(
+            "[handleWeb2] Done! Sending the response back to the client...",
+        )
+        console.log(
+            "[handleWeb2] Attestations validated. Deriving a transaction + operation...",
+        )
+
         return dahr
     } catch (error: any) {
         console.error("Error in handleWeb2:", error)

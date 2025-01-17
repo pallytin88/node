@@ -65,7 +65,8 @@ export default class groundControl {
             if (errorFlag) {
                 // Instead of failing, we switch to HTTP in case of failure
                 protocol = "http"
-                            } else {
+                console.log("[groundControl] [ Failure ] Switching to HTTP")
+            } else {
                 // Else we can start da server
                 try {
                     groundControl.options = {
@@ -79,7 +80,11 @@ export default class groundControl {
                     )
                 } catch (e) {
                     // Also here, we fallback happily
-                                                            protocol = "http"
+                    console.log(e)
+                    console.log(
+                        "[groundControl] [ Failure ] Failed to start HTTPS server. Switching to HTTP",
+                    )
+                    protocol = "http"
                 }
             }
         }
@@ -90,7 +95,15 @@ export default class groundControl {
             )
         }
         groundControl.server.listen(port, host, () => {
-                    })
+            console.log(
+                "Ground Control Server is running at " +
+                    protocol +
+                    "://" +
+                    host +
+                    ":" +
+                    port,
+            )
+        })
     }
 
     // INFO This is the handler for the server
@@ -105,8 +118,10 @@ export default class groundControl {
             res.end()
             return
         }
-                let args = groundControl.parse(url)
-        //        let response = await groundControl.dispatch(args)
+        console.log(url)
+        let args = groundControl.parse(url)
+        //console.log(args)
+        let response = await groundControl.dispatch(args)
         res.setHeader("Content-Type", "application/json")
         res.end(JSON.stringify(response))
     }

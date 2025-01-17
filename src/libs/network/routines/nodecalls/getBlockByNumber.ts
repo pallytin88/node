@@ -7,14 +7,16 @@ export default async function getBlockByNumber(
     const blockNumber: number = data.blockNumber
 
     if (!blockNumber) {
-                return {
+        console.log("[SERVER ERROR] Missing blockNumber 💀")
+        return {
             result: 400,
             response: "error",
             extra: "Block number not provided",
             require_reply: false,
         }
     } else {
-                const block = await Chain.getBlockByNumber(data.blockNumber)
+        console.log("[SERVER] Received getBlockByNumber: " + data.blockNumber)
+        const block = await Chain.getBlockByNumber(data.blockNumber)
 
         if (block) {
             return {

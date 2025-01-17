@@ -1,3 +1,4 @@
+import * as socket from "socket.io"
 import * as socket_client from "socket.io-client"
 
 export default class Network {
@@ -11,18 +12,21 @@ export default class Network {
             socket = socket_client.connect(rpc_url)
             let timeout = 5000
             socket.on("connect", () => {
-                                return socket
+                console.log("Connected to RPC server")
+                return socket
             })
             while (timeout > 0) {
                 if (socket.connected) {
                     return socket
                 }
-                                await new Promise(resolve => setTimeout(resolve, 1000))
+                console.log("Waiting for socket connection...")
+                await new Promise(resolve => setTimeout(resolve, 1000))
                 timeout -= 1000
             }
             return null
         } catch (e) {
-                        return null
+            console.log(e)
+            return null
         }
     }
 }

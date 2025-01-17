@@ -2,9 +2,9 @@ import Cryptography from "src/libs/crypto/cryptography"
 import Hashing from "src/libs/crypto/hashing"
 import { getSharedState } from "src/utilities/sharedState"
 
-import { Operation } from "@kynesyslabs/demosdk/types"
 import GCR from "../../blockchain/gcr/gcr"
 import Mempool from "../../blockchain/mempool"
+import { Operation } from "@kynesyslabs/demosdk/types"
 /* eslint-disable no-unused-vars */
 import Transaction from "../../blockchain/transaction"
 
@@ -34,7 +34,8 @@ export async function deriveMempoolOperation(
                 typeof v === "bigint" ? v.toString() : v,
             )
         } catch (e) {
-                        return false
+            console.log(e)
+            return false
         }
     }
     // We should have a valid, attested request: lets handle it
@@ -43,9 +44,13 @@ export async function deriveMempoolOperation(
     // Deriving a transaction
     // TODO Replace with deriveTransaction(data) using data.type
     derivedTx = await createTransaction(data) // A simple tx with data inside
-        //    // Deriving an operation from the tx
+    console.log("Derived tx:")
+    //console.log(derivedTx)
+    // Deriving an operation from the tx
     derivedOperation = await createOperation(derivedTx) // An operation witnessing the validity of the data requested
-        //    if (insert) {
+    console.log("Derived operation:")
+    //console.log(derivedOperation)
+    if (insert) {
         // ANCHOR Inserting the operation in the next mempool session with the proper data
         Mempool.addTransaction(derivedTx)
         // ANCHOR And we do the same for the derived operation, inserting it in the GCR

@@ -3,7 +3,10 @@
 import fs from "fs"
 // LINK https://github.com/http-party/node-http-proxy?tab=readme-ov-file#https---https
 import httpProxy from "http-proxy"
+import Cryptography from "src/libs/crypto/cryptography"
+import Hashing from "src/libs/crypto/hashing"
 import required from "src/utilities/required"
+import { getSharedState } from "src/utilities/sharedState"
 
 export interface IHTTPSCerts {
     key: string
@@ -73,7 +76,9 @@ export default class proxyManager {
                 secure: this.is_secure, // Depends on the target
             })
             .listen(this.port)
-         +
+        console.log(
+            "Proxy server listening on port " +
+                this.port.toString() +
                 " with id " +
                 this.proxid,
         )
@@ -88,16 +93,19 @@ export default class proxyManager {
         required(this.isOn, "Proxy is not running")
         // TODO Add listeners for the proxy based on this blurbprint
         this.internal_proxy.on("error", (err) => {
-                    })
+            console.log("Proxy server error: " + err)
+        })
         this.internal_proxy.on("proxyReq", (proxyReq, req, res, options) => {
-                    })
+            console.log("Proxy request")
+        })
     }
 
     // NOTE Stop the proxy
     public stop() {
         if (this.isOn) {
             this.isOn = false
-                        this.internal_proxy.close()
+            console.log("Stopping proxy server with id " + this.proxid)
+            this.internal_proxy.close()
             proxyManager._proxies.delete(this.proxid)
         }
     }

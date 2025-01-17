@@ -5,12 +5,14 @@ export default async function getPreviousHashFromBlockHash(
 ): Promise<any> {
     let response = null
     let extra = ""
-        if (data.blockHash === undefined || data.blockHash === "") {
+    console.log("[SERVER] Received getPreviousHashFromBlockNumber")
+    if (data.blockHash === undefined || data.blockHash === "") {
         response = "error"
         extra = "Block hash is not valid"
         return { response, extra }
     }
     response = await Chain.getBlockByHash(data.blockHash)
-        response = response.content.previousHash
+    console.log("[CHAIN.ts] Received reply from the database: got a block")
+    response = response.content.previousHash
     return response
 }

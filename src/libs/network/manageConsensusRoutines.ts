@@ -1,20 +1,20 @@
 import { RPCResponse } from "@kynesyslabs/demosdk/types"
+import getCommonValidatorSeed from "../consensus/v2/routines/getCommonValidatorSeed"
+import { emptyResponse } from "./server_rpc"
 import _ from "lodash"
-import log from "src/utilities/logger"
 import { getSharedState } from "src/utilities/sharedState"
-import { Waiter } from "src/utilities/waiter"
-import { checkConsensusTime } from "../consensus/routines/consensusTime"
+import getShard from "../consensus/v2/routines/getShard"
+import manageProposeBlockHash from "../consensus/v2/routines/manageProposeBlockHash"
 import { ValidationData } from "../consensus/v2/interfaces"
+import { checkConsensusTime } from "../consensus/routines/consensusTime"
 import {
     consensusRoutine,
     isConsensusAlreadyRunning,
 } from "../consensus/v2/PoRBFT"
-import getCommonValidatorSeed from "../consensus/v2/routines/getCommonValidatorSeed"
-import getShard from "../consensus/v2/routines/getShard"
-import manageProposeBlockHash from "../consensus/v2/routines/manageProposeBlockHash"
-import SecretaryManager from "../consensus/v2/types/secretaryManager"
+import log from "src/utilities/logger"
 import Cryptography from "../crypto/cryptography"
-import { emptyResponse } from "./server_rpc"
+import SecretaryManager from "../consensus/v2/types/secretaryManager"
+import { Waiter } from "src/utilities/waiter"
 
 export interface ConsensusMethod {
     method:
@@ -119,7 +119,10 @@ export default async function manageConsensusRoutines(
             return response
 
         case "proposeBlockHash": // For shard members to vote on a block hash
-                                                // TODO
+            console.log("[Consensus Message Received] Propose Block Hash")
+            console.log("Block Hash: ", payload.params[0])
+            console.log("Validation Data: ", payload.params[1])
+            // TODO
             // compare the block hash with the one we have and reply
             try {
                 response = await manageProposeBlockHash(

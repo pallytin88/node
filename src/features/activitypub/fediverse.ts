@@ -18,8 +18,10 @@ app.get(
     "/:collection/:id",
     (req: { params: { collection: any; id: any } }, res: any) => {
         const { collection, id } = req.params
-                if (!database) {
-                        res.status(500).json({ error: "Database not initialized" })
+        console.log("Reading: " + collection + "/" + id)
+        if (!database) {
+            console.log("Database not initialized")
+            res.status(500).json({ error: "Database not initialized" })
             return
         }
         // TODO Authentication
@@ -37,8 +39,10 @@ app.put(
     "/:collection/:id",
     (req: { params: { collection: any; id: any }; body: any }, res: any) => {
         const { collection, id } = req.params
-                if (!database) {
-                        res.status(500).json({ error: "Database not initialized" })
+        console.log("Updating: " + collection + "/" + id)
+        if (!database) {
+            console.log("Database not initialized")
+            res.status(500).json({ error: "Database not initialized" })
             return
         }
         // TODO Authentication
@@ -58,17 +62,20 @@ async function main() {
         await sleep(1000)
         counter++
         if (counter > 10) {
-                        process.exit(1)
+            console.log("Timeout: server never came alive")
+            process.exit(1)
         }
     }
 
     // Creating or opening a database connection
     database = new ActivityPubStorage("./db.sqlite3")
-    }
+    console.log("Connected to database")
+}
 main()
 
 // Start the server
 const port = process.env.PORT || 3000
 app.listen(port, () => {
-        connected = true
+    console.log(`ActivityPub server listening on port ${port}`)
+    connected = true
 })

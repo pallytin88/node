@@ -13,24 +13,28 @@ KyneSys Labs: https://www.kynesys.xyz/
 import Datasource from "src/model/datasource"
 import { Blocks } from "src/model/entities/Blocks"
 import { GCRHashes } from "src/model/entities/GCR/GCRHashes"
-import { GCRExtended, GlobalChangeRegistry } from "src/model/entities/GCR/GlobalChangeRegistry"
+import { GlobalChangeRegistry } from "src/model/entities/GCR/GlobalChangeRegistry"
+import { GCRExtended } from "src/model/entities/GCR/GlobalChangeRegistry"
 import { Transactions } from "src/model/entities/Transactions"
-import { ILike, MoreThan } from "typeorm"
+import { MoreThan, ILike } from "typeorm"
 
 import {
+    AddressInfo,
     Operation,
-    TransactionContent
+    StatusNative as StatusNativeType,
+    StatusProperties as StatusPropertiesType,
+    TransactionContent,
 } from "@kynesyslabs/demosdk/types"
 
 import { Hashing } from "node_modules/@kynesyslabs/demosdk/build/encryption"
 
-import log from "src/utilities/logger"
-import { getSharedState } from "src/utilities/sharedState"
-import { Peer } from "../peer"
 import Block from "./block"
 import manageNative from "./gcr/gcr_routines/manageNative"
-import Mempool from "./mempool"
 import Transaction from "./transaction"
+import { Peer } from "../peer"
+import Mempool from "./mempool"
+import log from "src/utilities/logger"
+import { getSharedState } from "src/utilities/sharedState"
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -49,7 +53,7 @@ export default class Chain {
             const db = await Datasource.getInstance()
             return await db.getDataSource().query(sql_query)
         } catch (err) {
-            )
+            console.log("[ChainDB] [ ERROR ]: " + JSON.stringify(err))
             console.error(err)
             throw err
         }
@@ -60,7 +64,7 @@ export default class Chain {
             const db = await Datasource.getInstance()
             return await db.getDataSource().query(sql_query)
         } catch (err) {
-            )
+            console.log("[ChainDB] [ ERROR ]: " + JSON.stringify(err))
             console.error(err)
             throw err
         }
@@ -80,7 +84,7 @@ export default class Chain {
                 }),
             )
         } catch (error) {
-            )
+            console.log("[ChainDB] [ ERROR ]: " + JSON.stringify(error))
             console.error(error)
             throw error // It does not crash the node, as it is caught by the endpoint handler
         }
@@ -152,11 +156,14 @@ export default class Chain {
     }
 
     static async getGenesisBlock(): Promise<Blocks> {
-                const db = await Datasource.getInstance()
+        console.log("get genesis block")
+        const db = await Datasource.getInstance()
         const blockRepository = db.getDataSource().getRepository(Blocks)
 
         let genBlock = await blockRepository.findOneBy({ number: 0 })
-                //        return genBlock
+        console.log("[getGenesisBlock] genesis Block retrieved")
+        //console.log(genBlock)
+        return genBlock
     }
 
     // INFO Get the current pending transactions pool
@@ -460,7 +467,8 @@ export default class Chain {
         genesis_tx.content.transaction_fee.additional_fee = 0
 
         genesis_tx.hash = Hashing.sha256(JSON.stringify(genesis_tx.content))
-        
+        console.log(genesis_tx)
+
         // Build a block containing the genesis tx
         genesis_block.content.timestamp = genesis_tx.content.timestamp
         genesis_block.content.ordered_transactions.push(genesis_tx.hash)
@@ -488,9 +496,15 @@ export default class Chain {
             },
         }
         // Insert the genesis block into the database
-        //                                        //await this.insertTransaction(genesis_tx)
+        //console.log(genesis_block)
+        console.log("[GENESIS] Block generated, ready to insert it")
+        console.log(genesis_block)
+        console.log("[GENESIS] inserting transaction into the mempool")
+        console.log(genesis_tx)
+        //await this.insertTransaction(genesis_tx)
         await Mempool.addTransaction(genesis_tx) // ! FIXME This fails
-                const genesisBlock = await this.insertBlock(
+        console.log("[GENESIS] inserted transaction")
+        const genesisBlock = await this.insertBlock(
             genesis_block,
             [genesis_op],
             0,
@@ -531,8 +545,13 @@ export default class Chain {
         transaction: Transaction,
         status: string = "confirmed",
     ): Promise<boolean> {
-                const rawTransaction = Transaction.toRawTransaction(transaction, status)
-                        const db = await Datasource.getInstance()
+        console.log(
+            "[insertTransaction] Inserting transaction: " + transaction.hash,
+        )
+        const rawTransaction = Transaction.toRawTransaction(transaction, status)
+        console.log("[insertTransaction] Raw transaction: ")
+        console.log(rawTransaction)
+        const db = await Datasource.getInstance()
         const transactionRepository = db
             .getDataSource()
             .getRepository(Transactions)
@@ -609,14 +628,16 @@ export default class Chain {
         const blockRepository = db.getDataSource().getRepository(Blocks)
 
         await blockRepository.delete({ number: MoreThan(0) })
-            }
+        console.log("Pruned all blocks except the genesis block.")
+    }
 
     static async nukeGenesis(): Promise<void> {
         const db = await Datasource.getInstance()
         const blockRepository = db.getDataSource().getRepository(Blocks)
 
         await blockRepository.delete({ number: 0 })
-            }
+        console.log("Deleted the genesis block.")
+    }
 
     static async updateGenesisTimestamp(newTimestamp: number): Promise<void> {
         const db = await Datasource.getInstance()
@@ -630,6 +651,7 @@ export default class Chain {
                 timestamp: newTimestamp,
             }
             await blockRepository.save(genesisBlock)
-                    }
+            console.log("Updated the timestamp of the genesis block.")
+        }
     }
 }

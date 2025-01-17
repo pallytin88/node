@@ -8,7 +8,8 @@ export class ActivityPubStorage {
             if (err) {
                 console.error(err.message)
             }
-                        this.createTables()
+            console.log("Connected to the SQLite database.")
+            this.createTables()
         })
     }
 
@@ -44,7 +45,8 @@ export class ActivityPubStorage {
             if (err) {
                 return console.error(err.message)
             }
-                    })
+            console.log(`Item with ID ${item.id} inserted into ${collection}`)
+        })
     }
 
     getItem(collection, id, callback) {
@@ -54,7 +56,8 @@ export class ActivityPubStorage {
                 return console.error(err.message)
             }
             try {
-                                const data = row
+                console.log(row)
+                const data = row
                 callback(data)
             } catch (e) {
                 console.error("Error parsing JSON data:", e)
@@ -68,6 +71,7 @@ export class ActivityPubStorage {
             if (err) {
                 return console.error(err.message)
             }
-                    })
+            console.log(`Item with ID ${id} deleted from ${collection}`)
+        })
     }
 }

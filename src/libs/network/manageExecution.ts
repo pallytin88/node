@@ -1,8 +1,12 @@
-import { BundleContent, ISecurityReport, RPCResponse, Transaction, ValidityData } from "@kynesyslabs/demosdk/types"
+import { RPCResponse } from "@kynesyslabs/demosdk/types"
+import { emptyResponse } from "./server_rpc"
+import { BundleContent } from "@kynesyslabs/demosdk/types"
+import { Transaction, ValidityData } from "@kynesyslabs/demosdk/types"
+import ServerHandlers from "./endpointHandlers"
+import { ISecurityReport } from "@kynesyslabs/demosdk/types"
+import * as Security from "src/libs/network/securityModule"
 import _ from "lodash"
 import terminalkit from "terminal-kit"
-import ServerHandlers from "./endpointHandlers"
-import { emptyResponse } from "./server_rpc"
 
 const term = terminalkit.terminal
 
@@ -11,7 +15,9 @@ export async function manageExecution(
 ): Promise<RPCResponse> {
     let return_value = _.cloneDeep(emptyResponse)
 
-        
+    console.log("[serverListeners] content.type: " + content.type)
+    console.log("[serverListeners] content.extra: " + content.extra)
+
     if (content.type === "l2ps") {
         let response = await ServerHandlers.handleL2PS(content)
         if (response.result !== 200) {
@@ -62,7 +68,10 @@ export async function manageExecution(
                 var result = await ServerHandlers.handleExecuteTransaction(
                     validityDataPayload,
                 )
-                                // Destructuring the result to get the extra, require_reply and response
+                console.log(
+                    "[SERVER] Transaction executed. Sending back the result",
+                )
+                // Destructuring the result to get the extra, require_reply and response
                 return_value.result = 200
                 return_value.response = result.response
                 return_value.require_reply = result.require_reply
@@ -71,7 +80,8 @@ export async function manageExecution(
             } catch (error) {
                 let errorMessage =
                     "[SERVER] Error while handling broadcastTx: " + error
-                                return_value.result = 400
+                console.log(errorMessage)
+                return_value.result = 400
                 return_value.response = "Bad Request"
                 return_value.extra = errorMessage
                 return_value.require_reply = false
@@ -86,7 +96,9 @@ export async function manageExecution(
             return_value.require_reply = false
             break
     }
-    //    //
+    //console.log("content.message: " + content.message)
+    //console.log("content.message.action: " + content.message.action)
+
     // ANCHOR Reply logic
 
     // TODO & REVIEW Call security module for send limiting messages
@@ -97,5 +109,7 @@ export async function manageExecution(
     }
 
     // Sending back the response
-        //    return return_value
+    console.log("[SERVER] Sending back a response")
+    //console.log(return_value)
+    return return_value
 }

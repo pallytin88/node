@@ -9,7 +9,6 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 */
 
-import { Operation, ValidityData } from "@kynesyslabs/demosdk/types"
 import { pki } from "node-forge"
 import Chain from "src/libs/blockchain/chain"
 import GCR from "src/libs/blockchain/gcr/gcr"
@@ -17,10 +16,12 @@ import calculateCurrentGas from "src/libs/blockchain/routines/calculateCurrentGa
 import executeNativeTransaction from "src/libs/blockchain/routines/executeNativeTransaction"
 import Transaction from "src/libs/blockchain/transaction"
 import Cryptography from "src/libs/crypto/cryptography"
-import { ForgeToHex } from "src/libs/crypto/forgeUtils"
 import Hashing from "src/libs/crypto/hashing"
 import { getSharedState } from "src/utilities/sharedState"
 import terminalkit from "terminal-kit"
+import { Operation, ValidityData } from "@kynesyslabs/demosdk/types"
+import required from "src/utilities/required"
+import { ForgeToHex } from "src/libs/crypto/forgeUtils"
 const term = terminalkit.terminal
 
 // INFO Cryptographically validate a transaction and calculate gas
@@ -36,8 +37,12 @@ export async function confirmTransaction(
     let publicKey = id_ed25519.publicKey
     let privateKey = id_ed25519.privateKey
     // REVIEW This should work just fine
-        
-            // REVIEW Below: if this does not work, use ValidityData interface and fill manually
+    console.log("Signature: ")
+    console.log(tx.signature)
+
+    console.log("[Tx Validation] Examining it\n")
+    console.log(tx)
+    // REVIEW Below: if this does not work, use ValidityData interface and fill manually
     let validityData: ValidityData = {
         data: {
             valid: false,
@@ -85,7 +90,10 @@ export async function confirmTransaction(
         validityData = await signValidityData(validityData)
         return validityData
     }
-        validityData.data.message =
+    console.log(
+        "[Native Tx Validation] Transaction validity verified, compiling ValidityData\n",
+    )
+    validityData.data.message =
         "[Native Tx Validation] Transaction signature verified\n"
     validityData.data.valid = true
     validityData = await signValidityData(validityData)
@@ -119,7 +127,10 @@ async function defineGas(
         } else {
             from = ForgeToHex(tx.content.from)
         }
-            } catch (e) {
+        console.log(
+            "[Native Tx Validation] Calculating gas for: " + from + "\n",
+        )
+    } catch (e) {
         term.red.bold(
             "[Native Tx Validation] [FROM ERROR] No 'from' field found in the transaction\n",
         )
@@ -193,7 +204,9 @@ async function defineGas(
             additional_fee: 0,
         }, // This is the gas operation so it doesn't have additional fees
     }
-        //    return [true, gas_operation]
+    console.log("[Native Tx Validation] Gas Operation derived\n")
+    //console.log(gas_operation)
+    return [true, gas_operation]
 }
 
 export async function assignNonce(tx: Transaction): Promise<Boolean> {
@@ -223,11 +236,15 @@ export async function broadcastVerifiedNativeTransaction(
 
     // NOTE Now we can save the gas operation as the tx is set to be executed
     // and the gas will be deducted anyway
-        GCR.getInstance().operations.push(validityData.data.gas_operation)
+    console.log("[TX RECEIVED] Gas Operation added to the GCR\n")
+    GCR.getInstance().operations.push(validityData.data.gas_operation)
 
     // Finally, we add all the derived operations to the GCR
     for (let i = 0; i < execution[2].length; i++) {
-                //        GCR.getInstance().operations.push(execution[2][i])
-            }
+        console.log("[TX RECEIVED] Operation derived")
+        //console.log(execution[2][i])
+        GCR.getInstance().operations.push(execution[2][i])
+        console.log("[TX RECEIVED] Operation added to the GCR\n")
+    }
     return execution
 }

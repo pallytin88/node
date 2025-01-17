@@ -9,11 +9,12 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 */
 
+import { cryptography } from "src/libs/crypto"
 
-import log from "src/utilities/logger"
 import Peer from "../Peer"
 import PeerManager from "../PeerManager"
 import getPeerIdentity from "./getPeerIdentity"
+import log from "src/utilities/logger"
 
 const peerManager = PeerManager.getInstance()
 
@@ -27,37 +28,59 @@ export async function peerlistCheck(local_list: Peer[]): Promise<Peer[]> {
 export default async function peerBootstrap(
     local_list: Peer[],
 ): Promise<Peer[]> {
-        // Validity check
+    console.log("[PEER BOOTSTRAP] Loading peers...")
+    // Validity check
     for (let i = 0; i < local_list.length; i++) {
-                // ANCHOR Extract peer info from the string
+        console.log("[PEER BOOTSTRAP] Checking peer " + local_list[i])
+        // ANCHOR Extract peer info from the string
         let _currentPeer: Peer = local_list[i] // The url of the peer
         // If there is a : in the url, we assume it's a address + port
         let currentPeerUrl: string = _currentPeer.connection.string
         let currentPublicKey: string = _currentPeer.identity
-         
+        console.log(
+            "[BOOTSTRAP] Testing " +
+                currentPeerUrl +
+                " with id " +
+                currentPublicKey,
+        ) 
         // ANCHOR Connection test and hello_peer routine
         const blankPeer = new Peer(currentPeerUrl, currentPublicKey)
             // Adding identity if any
-                // After this, the peer object will have an identity and thus will be verified
+        console.log(
+            "[BOOTSTRAP] Testing " + currentPeerUrl + " identity",
+        )
+        // After this, the peer object will have an identity and thus will be verified
         let verifiedPeer = await getPeerIdentity(
             blankPeer,
             currentPublicKey,
         )
         if (!verifiedPeer) {
-                        peerManager.addOfflinePeer(blankPeer)
+            console.log("[PEERBOOTSTRAP] [FAILED] Failed to get peer identity: see above")
+            peerManager.addOfflinePeer(blankPeer)
             peerManager.removeOnlinePeer(blankPeer.identity)
             continue
         }
-                        // ! remove debug code
+        console.log(
+            "[BOOSTRAP: overriding connectionstring] " + currentPeerUrl,
+        )
+        console.log(verifiedPeer)
+        // ! remove debug code
         try {
             verifiedPeer.connection.string = currentPeerUrl // Adding this step
         } catch (error) {
-                        log.critical("Error setting connection string: " + error)
+            console.log("[PEERBOOTSTRAP] Error setting connection string: " + error)
+            log.critical("Error setting connection string: " + error)
             continue
         }
-                log.info("[BOOTSTRAP] OK: Valid peer " + currentPeerUrl + "\n")
+        console.log(
+            "[BOOTSTRAP] OK: Valid peer " +
+                currentPeerUrl +
+                "\n",
+        )
+        log.info("[BOOTSTRAP] OK: Valid peer " + currentPeerUrl + "\n")
 
-                // This should automatically add the peer to the peer list or the offline list
+        console.log("[BOOTSTRAP] _currentPeerObject", verifiedPeer)
+        // This should automatically add the peer to the peer list or the offline list
         // let response = await verifiedPeer.longCall({
         //     method: "hello_peer",
         //     params: [{
@@ -66,13 +89,14 @@ export default async function peerBootstrap(
         //     }],
         // }, true, 250, 3)
         await PeerManager.sayHelloToPeer(verifiedPeer)
-        // )
+        // console.log("[BOOTSTRAP] Response: " + JSON.stringify(response, null, 2))
     }
     // Dying if there are no valid peers
     if (peerManager.getPeers().length == 0) {
         // Exit if there are no valid peers
-            } else {
-        .length)
+        console.log("No valid peers found, listening for connections...")
+    } else {
+        console.log("Valid peers found: " + peerManager.getPeers().length)
     }
     return peerManager.getPeers()
 }
